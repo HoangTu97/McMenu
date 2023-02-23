@@ -1,0 +1,28 @@
+{
+  "mcMenuApp": {
+    "nutritionSummary": {
+      "home": {
+        "title": "Nutrition Summaries",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Nutrition Summary",
+        "createOrEditLabel": "Create or edit a Nutrition Summary",
+        "search": "Search for Nutrition Summary",
+        "notFound": "No Nutrition Summaries found"
+      },
+      "created": "A new Nutrition Summary is created with identifier {{ param }}",
+      "updated": "A Nutrition Summary is updated with identifier {{ param }}",
+      "deleted": "A Nutrition Summary is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Nutrition Summary {{ id }}?"
+      },
+      "detail": {
+        "title": "Nutrition Summary"
+      },
+      "id": "ID",
+      "key": "Key",
+      "quantityMg": "Quantity Mg",
+      "percentDailyValues": "Percent Daily Values",
+      "product": "Product"
+    }
+  }
+}

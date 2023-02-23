@@ -1,0 +1,49 @@
+{
+  "applications": "*",
+  "changelogDate": "20230223050809",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "meal",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "imageUrl",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "5000"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Meal",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "meal",
+      "ownerSide": true,
+      "relationshipName": "product",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "category",
+      "otherEntityRelationshipName": "meal",
+      "ownerSide": false,
+      "relationshipName": "category",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}
