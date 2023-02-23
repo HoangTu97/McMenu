@@ -110,6 +110,16 @@ public class ProductService {
         return productRepository.findAll().stream().map(productMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
     }
 
+    @Transactional(readOnly = true)
+    public List<ProductDTO> findAllByCate(Long id) {
+        log.debug("Request to get all Products");
+        return productRepository
+            .findByCategories_Id(id)
+            .stream()
+            .map(productMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
     /**
      * Get all the products with eager load of many-to-many relationships.
      *

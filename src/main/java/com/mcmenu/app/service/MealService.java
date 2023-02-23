@@ -106,6 +106,12 @@ public class MealService {
         return mealRepository.findAll().stream().map(mealMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
     }
 
+    @Transactional(readOnly = true)
+    public List<MealDTO> findAllByCate(Long id) {
+        log.debug("Request to get all Meals");
+        return mealRepository.findByCategories_Id(id).stream().map(mealMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+    }
+
     /**
      * Get all the meals with eager load of many-to-many relationships.
      *

@@ -17,6 +17,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MealRepository extends MealRepositoryWithBagRelationships, JpaRepository<Meal, Long> {
+    @Query("select m from Meal m inner join m.categories categories where categories.id = ?1")
+    List<Meal> findByCategories_Id(Long id);
+
     default Optional<Meal> findOneWithEagerRelationships(Long id) {
         return this.fetchBagRelationships(this.findById(id));
     }
