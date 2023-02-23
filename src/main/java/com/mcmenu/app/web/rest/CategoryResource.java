@@ -4,20 +4,13 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 
 import com.mcmenu.app.repository.CategoryRepository;
 import com.mcmenu.app.service.CategoryService;
-import com.mcmenu.app.service.MealService;
-import com.mcmenu.app.service.ProductService;
 import com.mcmenu.app.service.dto.CategoryDTO;
-import com.mcmenu.app.service.dto.CategoryFullMenuDTO;
-import com.mcmenu.app.service.dto.MealDTO;
-import com.mcmenu.app.service.dto.ProductDTO;
 import com.mcmenu.app.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -47,19 +40,9 @@ public class CategoryResource {
 
     private final CategoryRepository categoryRepository;
 
-    private final ProductService productService;
-    private final MealService mealService;
-
-    public CategoryResource(
-        CategoryService categoryService,
-        CategoryRepository categoryRepository,
-        ProductService productService,
-        MealService mealService
-    ) {
+    public CategoryResource(CategoryService categoryService, CategoryRepository categoryRepository) {
         this.categoryService = categoryService;
         this.categoryRepository = categoryRepository;
-        this.productService = productService;
-        this.mealService = mealService;
     }
 
     /**
@@ -175,52 +158,6 @@ public class CategoryResource {
         log.debug("REST request to get Category : {}", id);
         Optional<CategoryDTO> categoryDTO = categoryService.findOne(id);
         return ResponseUtil.wrapOrNotFound(categoryDTO);
-    }
-
-    /**
-     * {@code GET  /categories/:id/full-menu} : get the "id" category.
-     *
-     * @param id the id of the categoryDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the
-     *         categoryDTO, or with status {@code 404 (Not Found)}.
-     */
-    @GetMapping("/categories/{id}/full-menu")
-    public ResponseEntity<List<CategoryFullMenuDTO>> getCategoryFullMenu(@PathVariable Long id) {
-        log.debug("REST request to get Category : {}", id);
-        Optional<CategoryDTO> categoryDTO = categoryService.findOne(id);
-        if (categoryDTO.isEmpty()) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        List<ProductDTO> productDTOS = productService.findAllByCate(id);
-        List<CategoryFullMenuDTO> list = productDTOS
-            .stream()
-            .map(e -> {
-                CategoryFullMenuDTO dto = new CategoryFullMenuDTO();
-                dto.setId(e.getId());
-                dto.setItemType(CategoryFullMenuDTO.ItemType.PRODUCT);
-                dto.setName(e.getName());
-                dto.setImageUrl(e.getImageUrl());
-                return dto;
-            })
-            .collect(Collectors.toList());
-
-        List<MealDTO> mealDTOS = mealService.findAllByCate(id);
-        list.addAll(
-            mealDTOS
-                .stream()
-                .map(e -> {
-                    CategoryFullMenuDTO dto = new CategoryFullMenuDTO();
-                    dto.setId(e.getId());
-                    dto.setItemType(CategoryFullMenuDTO.ItemType.MEAL);
-                    dto.setName(e.getName());
-                    dto.setImageUrl(e.getImageUrl());
-                    return dto;
-                })
-                .collect(Collectors.toList())
-        );
-
-        return ResponseEntity.ok(list);
     }
 
     /**

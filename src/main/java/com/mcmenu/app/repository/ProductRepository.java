@@ -21,6 +21,12 @@ public interface ProductRepository extends ProductRepositoryWithBagRelationships
     @Query("select p from Product p inner join p.categories categories where categories.id = ?1")
     List<Product> findByCategories_Id(Long id);
 
+    @Query("select p from Product p where p.relatedProductId = ?1")
+    List<Product> findByRelatedProductId(Long relatedProductId);
+
+    @Query("select p from Product p inner join p.meals meals where meals.id = ?1")
+    List<Product> findByMeals_Id(Long id);
+
     default Optional<Product> findOneWithEagerRelationships(Long id) {
         return this.fetchBagRelationships(this.findById(id));
     }

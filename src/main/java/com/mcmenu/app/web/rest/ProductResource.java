@@ -1,7 +1,5 @@
 package com.mcmenu.app.web.rest;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.repository.ProductRepository;
 import com.mcmenu.app.service.ProductService;
 import com.mcmenu.app.service.dto.ProductDTO;
@@ -11,7 +9,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;

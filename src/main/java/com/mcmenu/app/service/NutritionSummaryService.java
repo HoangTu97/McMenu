@@ -7,8 +7,10 @@ import com.mcmenu.app.repository.NutritionSummaryRepository;
 import com.mcmenu.app.repository.search.NutritionSummarySearchRepository;
 import com.mcmenu.app.service.dto.NutritionSummaryDTO;
 import com.mcmenu.app.service.mapper.NutritionSummaryMapper;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -110,6 +112,35 @@ public class NutritionSummaryService {
             .stream()
             .map(nutritionSummaryMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Transactional(readOnly = true)
+    public List<NutritionSummaryDTO> findAllByProductId(Long id) {
+        return nutritionSummaryRepository
+            .findByProduct_Id(id)
+            .stream()
+            .map(nutritionSummaryMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, List<NutritionSummaryDTO>> findMapByProductIds(List<Long> productIds) {
+        List<NutritionSummaryDTO> nutritionSummaryDTOS = nutritionSummaryRepository
+            .findByProduct_IdIn(productIds)
+            .stream()
+            .map(nutritionSummaryMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+
+        Map<Long, List<NutritionSummaryDTO>> ret = new HashMap<>();
+        for (Long productId : productIds) {
+            List<NutritionSummaryDTO> list = nutritionSummaryDTOS
+                .stream()
+                .filter(e -> e.getProduct().getId().equals(productId))
+                .collect(Collectors.toList());
+            ret.put(productId, list);
+        }
+
+        return ret;
     }
 
     /**

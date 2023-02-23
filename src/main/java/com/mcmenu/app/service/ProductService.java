@@ -120,6 +120,20 @@ public class ProductService {
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    @Transactional(readOnly = true)
+    public List<ProductDTO> findAllByRelatedProductId(Long relatedProductId) {
+        return productRepository
+            .findByRelatedProductId(relatedProductId)
+            .stream()
+            .map(productMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDTO> findAllByMeal(Long id) {
+        return productRepository.findByMeals_Id(id).stream().map(productMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+    }
+
     /**
      * Get all the products with eager load of many-to-many relationships.
      *

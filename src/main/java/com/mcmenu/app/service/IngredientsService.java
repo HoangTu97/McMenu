@@ -1,14 +1,14 @@
 package com.mcmenu.app.service;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.domain.Ingredients;
 import com.mcmenu.app.repository.IngredientsRepository;
 import com.mcmenu.app.repository.search.IngredientsSearchRepository;
 import com.mcmenu.app.service.dto.IngredientsDTO;
 import com.mcmenu.app.service.mapper.IngredientsMapper;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -106,6 +106,30 @@ public class IngredientsService {
     public List<IngredientsDTO> findAll() {
         log.debug("Request to get all Ingredients");
         return ingredientsRepository.findAll().stream().map(ingredientsMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Transactional(readOnly = true)
+    public List<IngredientsDTO> findAllByProductId(Long id) {
+        return ingredientsRepository
+            .findByProducts_Id(id)
+            .stream()
+            .map(ingredientsMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, List<IngredientsDTO>> findMapByProductIds(List<Long> productIds) {
+        List<Ingredients> ingredients = ingredientsRepository.findByProducts_IdIn(productIds);
+        Map<Long, List<IngredientsDTO>> ret = new HashMap<>();
+        for (Long productId : productIds) {
+            List<IngredientsDTO> list = ingredients
+                .stream()
+                .filter(i -> i.getProducts().stream().anyMatch(p -> p.getId().equals(productId)))
+                .map(ingredientsMapper::toDto)
+                .collect(Collectors.toList());
+            ret.put(productId, list);
+        }
+        return ret;
     }
 
     /**
