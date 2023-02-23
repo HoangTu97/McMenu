@@ -1,6 +1,5 @@
 package com.mcmenu.app.service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mcmenu.app.domain.Category;
 import com.mcmenu.app.domain.Ingredients;
@@ -49,8 +48,6 @@ public class ElasticsearchIndexService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticsearchIndexService.class);
 
-    private final ElasticsearchClient client;
-
     private final CategoryRepository categoryRepository;
     private final CategorySearchRepository categorySearchRepository;
     private final IngredientsRepository ingredientsRepository;
@@ -63,7 +60,6 @@ public class ElasticsearchIndexService {
     private final ProductSearchRepository productSearchRepository;
 
     public ElasticsearchIndexService(
-        ElasticsearchClient client,
         CategoryRepository categoryRepository,
         CategorySearchRepository categorySearchRepository,
         IngredientsRepository ingredientsRepository,
@@ -75,7 +71,6 @@ public class ElasticsearchIndexService {
         ProductRepository productRepository,
         ProductSearchRepository productSearchRepository
     ) {
-        this.client = client;
         this.categoryRepository = categoryRepository;
         this.categorySearchRepository = categorySearchRepository;
         this.ingredientsRepository = ingredientsRepository;
@@ -145,6 +140,7 @@ public class ElasticsearchIndexService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
+            elasticsearchRepository.deleteAll();
             int size = 100;
             for (int i = 0; i <= jpaRepository.count() / size; i++) {
                 Pageable page = PageRequest.of(i, size);

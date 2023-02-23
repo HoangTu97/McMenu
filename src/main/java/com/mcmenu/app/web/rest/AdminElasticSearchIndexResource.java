@@ -36,6 +36,6 @@ public class AdminElasticSearchIndexResource {
     public ResponseEntity<Void> reindexAll() throws URISyntaxException {
         log.info("REST request to reindex Elasticsearch by user : {}", SecurityUtils.getCurrentUserLogin());
         elasticsearchIndexService.reindexAll();
-        return ResponseEntity.accepted().headers(HeaderUtil.createAlert(applicationName, "elasticsearch.reindex.accepted", null)).build();
+        return ResponseEntity.ok(null);
     }
 }

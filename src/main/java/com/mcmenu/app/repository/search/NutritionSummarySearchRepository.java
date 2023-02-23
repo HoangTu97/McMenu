@@ -5,6 +5,9 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import com.mcmenu.app.domain.NutritionSummary;
 import com.mcmenu.app.repository.NutritionSummaryRepository;
 import java.util.stream.Stream;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
@@ -41,8 +44,10 @@ class NutritionSummarySearchRepositoryInternalImpl implements NutritionSummarySe
 
     @Override
     public Stream<NutritionSummary> search(String query) {
-        NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryStringQuery(query));
-        return search(nativeSearchQuery);
+        //        NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryStringQuery(query));
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        queryBuilder.must(QueryBuilders.matchQuery("name", query).operator(Operator.AND));
+        return search(new NativeSearchQuery(queryBuilder));
     }
 
     @Override
