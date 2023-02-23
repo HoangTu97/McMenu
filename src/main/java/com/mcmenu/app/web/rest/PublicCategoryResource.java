@@ -1,8 +1,10 @@
 package com.mcmenu.app.web.rest;
 
 import com.mcmenu.app.repository.CategoryRepository;
+import com.mcmenu.app.service.CategoryService;
 import com.mcmenu.app.service.MealService;
 import com.mcmenu.app.service.ProductService;
+import com.mcmenu.app.service.dto.CategoryDTO;
 import com.mcmenu.app.service.dto.CategoryFullMenuDTO;
 import com.mcmenu.app.service.dto.MealDTO;
 import com.mcmenu.app.service.dto.ProductDTO;
@@ -29,15 +31,28 @@ public class PublicCategoryResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
 
     private final ProductService productService;
     private final MealService mealService;
 
-    public PublicCategoryResource(CategoryRepository categoryRepository, ProductService productService, MealService mealService) {
+    public PublicCategoryResource(
+        CategoryService categoryService,
+        CategoryRepository categoryRepository,
+        ProductService productService,
+        MealService mealService
+    ) {
+        this.categoryService = categoryService;
         this.categoryRepository = categoryRepository;
         this.productService = productService;
         this.mealService = mealService;
+    }
+
+    @GetMapping("/categories")
+    public List<CategoryDTO> getAllCategories() {
+        log.debug("REST request to get all Categories");
+        return categoryService.findAll();
     }
 
     @GetMapping("/categories/{id}/full-menu")
