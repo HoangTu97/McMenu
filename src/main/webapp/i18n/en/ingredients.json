@@ -1,0 +1,30 @@
+{
+  "mcMenuApp": {
+    "ingredients": {
+      "home": {
+        "title": "Ingredients",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ingredients",
+        "createOrEditLabel": "Create or edit a Ingredients",
+        "search": "Search for Ingredients",
+        "notFound": "No Ingredients found"
+      },
+      "created": "A new Ingredients is created with identifier {{ param }}",
+      "updated": "A Ingredients is updated with identifier {{ param }}",
+      "deleted": "A Ingredients is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ingredients {{ id }}?"
+      },
+      "detail": {
+        "title": "Ingredients"
+      },
+      "id": "ID",
+      "name": "Name",
+      "imageUrl": "Image Url",
+      "insideIngredients": "Inside Ingredients",
+      "insideContains": "Inside Contains",
+      "mayContains": "May Contains",
+      "product": "Product"
+    }
+  }
+}

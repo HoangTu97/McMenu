@@ -1,0 +1,9 @@
+{
+  "mcMenuApp": {
+    "PaymentType": {
+      "null": "",
+      "CASH": "CASH",
+      "CREDIT": "CREDIT"
+    }
+  }
+}

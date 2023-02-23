@@ -1,0 +1,22 @@
+{
+  "mcMenuApp": {
+    "NutritionKey": {
+      "null": "",
+      "CALORIES": "CALORIES",
+      "TOTAL_FAT": "TOTAL_FAT",
+      "TOTAL_CARBS": "TOTAL_CARBS",
+      "PROTEIN": "PROTEIN",
+      "SATUREATED_FAT": "SATUREATED_FAT",
+      "DIETARY_FIBER": "DIETARY_FIBER",
+      "CALCIUM": "CALCIUM",
+      "TRANS_FAT": "TRANS_FAT",
+      "TOTAL_SUGARS": "TOTAL_SUGARS",
+      "ADDED_SUGARS": "ADDED_SUGARS",
+      "IRON": "IRON",
+      "CHOLESTEROL": "CHOLESTEROL",
+      "VITAMIN_D": "VITAMIN_D",
+      "POTASSIUM": "POTASSIUM",
+      "SODIUM": "SODIUM"
+    }
+  }
+}
