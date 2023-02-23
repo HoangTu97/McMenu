@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/public")
 public class PublicCategoryResource {
 
-    private final Logger log = LoggerFactory.getLogger(CategoryResource.class);
+    private final Logger log = LoggerFactory.getLogger(PublicCategoryResource.class);
 
     private static final String ENTITY_NAME = "category";
 

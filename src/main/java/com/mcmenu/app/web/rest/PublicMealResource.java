@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/public")
 public class PublicMealResource {
 
-    private final Logger log = LoggerFactory.getLogger(MealResource.class);
+    private final Logger log = LoggerFactory.getLogger(PublicMealResource.class);
 
     private static final String ENTITY_NAME = "meal";
 

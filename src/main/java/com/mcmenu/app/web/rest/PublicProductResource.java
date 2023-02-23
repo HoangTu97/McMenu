@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/public")
 public class PublicProductResource {
 
-    private final Logger log = LoggerFactory.getLogger(ProductResource.class);
+    private final Logger log = LoggerFactory.getLogger(PublicProductResource.class);
 
     private static final String ENTITY_NAME = "product";
 
