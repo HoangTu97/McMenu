@@ -45,7 +45,7 @@ class IngredientsSearchRepositoryInternalImpl implements IngredientsSearchReposi
     public Stream<Ingredients> search(String query) {
         //        NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryStringQuery(query));
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        queryBuilder.must(QueryBuilders.matchQuery("name", query).operator(Operator.AND));
+        queryBuilder.must(QueryBuilders.matchQuery("name", "*" + query + "*").operator(Operator.AND));
         return search(new NativeSearchQuery(queryBuilder));
     }
 
