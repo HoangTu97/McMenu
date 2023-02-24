@@ -1,0 +1,28 @@
+{
+  "mcMenuApp": {
+    "nutritionSummary": {
+      "home": {
+        "title": "Nutrition Summaries",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Thêm mới một Nutrition Summary",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Nutrition Summary",
+        "search": "Tìm Nutrition Summary",
+        "notFound": "No Nutrition Summaries found"
+      },
+      "created": "Một Nutrition Summary mới được tạo với định danh {{ param }}",
+      "updated": "Một Nutrition Summary cập nhật với định danh {{ param }}",
+      "deleted": "Một Nutrition Summary đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Nutrition Summary {{ id }}?"
+      },
+      "detail": {
+        "title": "Nutrition Summary"
+      },
+      "id": "ID",
+      "key": "Key",
+      "quantityMg": "Quantity Mg",
+      "percentDailyValues": "Percent Daily Values",
+      "product": "Product"
+    }
+  }
+}

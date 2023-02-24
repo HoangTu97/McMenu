@@ -1,0 +1,29 @@
+{
+  "mcMenuApp": {
+    "meal": {
+      "home": {
+        "title": "Meals",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Thêm mới một Meal",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Meal",
+        "search": "Tìm Meal",
+        "notFound": "No Meals found"
+      },
+      "created": "Một Meal mới được tạo với định danh {{ param }}",
+      "updated": "Một Meal cập nhật với định danh {{ param }}",
+      "deleted": "Một Meal đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Meal {{ id }}?"
+      },
+      "detail": {
+        "title": "Meal"
+      },
+      "id": "ID",
+      "name": "Name",
+      "imageUrl": "Image Url",
+      "description": "Description",
+      "product": "Product",
+      "category": "Category"
+    }
+  }
+}

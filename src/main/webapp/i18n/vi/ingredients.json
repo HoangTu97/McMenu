@@ -1,0 +1,30 @@
+{
+  "mcMenuApp": {
+    "ingredients": {
+      "home": {
+        "title": "Ingredients",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Thêm mới một Ingredients",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Ingredients",
+        "search": "Tìm Ingredients",
+        "notFound": "No Ingredients found"
+      },
+      "created": "Một Ingredients mới được tạo với định danh {{ param }}",
+      "updated": "Một Ingredients cập nhật với định danh {{ param }}",
+      "deleted": "Một Ingredients đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Ingredients {{ id }}?"
+      },
+      "detail": {
+        "title": "Ingredients"
+      },
+      "id": "ID",
+      "name": "Name",
+      "imageUrl": "Image Url",
+      "insideIngredients": "Inside Ingredients",
+      "insideContains": "Inside Contains",
+      "mayContains": "May Contains",
+      "product": "Product"
+    }
+  }
+}

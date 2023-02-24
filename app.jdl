@@ -1,0 +1,58 @@
+entity User {
+}
+
+entity Category {
+  name String required
+  imageUrl String required
+}
+
+entity Meal {
+  name String required maxlength(255)
+  imageUrl String required maxlength(255)
+  description String maxlength(5000)
+}
+
+entity Product {
+  name String required maxlength(255)
+  imageUrl String required maxlength(255)
+  description String maxlength(5000)
+  isLimitedTimeOnly Boolean
+  relatedProductId Long
+  displayOrder Integer min(0)
+  label String
+  abbrLabel String
+  isDefault Boolean
+}
+
+enum NutritionKey {
+  CALORIES, TOTAL_FAT, TOTAL_CARBS, PROTEIN,
+  SATUREATED_FAT, DIETARY_FIBER, CALCIUM, TRANS_FAT,
+  TOTAL_SUGARS, ADDED_SUGARS, IRON, CHOLESTEROL,
+  VITAMIN_D, POTASSIUM, SODIUM
+}
+entity NutritionSummary {
+  key NutritionKey required
+  quantityMg Integer min(0)
+  percentDailyValues Integer min(0)
+}
+
+entity Ingredients {
+  name String required unique
+  imageUrl String required
+  insideIngredients String maxlength(5000)
+  insideContains String maxlength(255)
+  mayContains String maxlength(255)
+}
+
+relationship OneToMany {
+  Product to NutritionSummary
+}
+
+relationship ManyToMany {
+  Category to Product
+  Category to Meal
+  Meal to Product
+  Product to Ingredients
+}
+
+dto * with mapstruct

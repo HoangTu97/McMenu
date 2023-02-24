@@ -48,6 +48,20 @@ public class CacheConfiguration {
             createCache(cm, com.mcmenu.app.domain.User.class.getName());
             createCache(cm, com.mcmenu.app.domain.Authority.class.getName());
             createCache(cm, com.mcmenu.app.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.mcmenu.app.domain.Category.class.getName());
+            createCache(cm, com.mcmenu.app.domain.Category.class.getName() + ".products");
+            createCache(cm, com.mcmenu.app.domain.Category.class.getName() + ".meals");
+            createCache(cm, com.mcmenu.app.domain.Meal.class.getName());
+            createCache(cm, com.mcmenu.app.domain.Meal.class.getName() + ".products");
+            createCache(cm, com.mcmenu.app.domain.Meal.class.getName() + ".categories");
+            createCache(cm, com.mcmenu.app.domain.Product.class.getName());
+            createCache(cm, com.mcmenu.app.domain.Product.class.getName() + ".ingredients");
+            createCache(cm, com.mcmenu.app.domain.Product.class.getName() + ".categories");
+            createCache(cm, com.mcmenu.app.domain.NutritionSummary.class.getName());
+            createCache(cm, com.mcmenu.app.domain.Ingredients.class.getName());
+            createCache(cm, com.mcmenu.app.domain.Ingredients.class.getName() + ".products");
+            createCache(cm, com.mcmenu.app.domain.Product.class.getName() + ".nutritionSummaries");
+            createCache(cm, com.mcmenu.app.domain.Product.class.getName() + ".meals");
             // jhipster-needle-ehcache-add-entry
         };
     }

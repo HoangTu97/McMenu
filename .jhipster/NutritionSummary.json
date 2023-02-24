@@ -1,0 +1,41 @@
+{
+  "applications": "*",
+  "changelogDate": "20230223050811",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "nutrition_summary",
+  "fields": [
+    {
+      "fieldName": "key",
+      "fieldType": "NutritionKey",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CALORIES,TOTAL_FAT,TOTAL_CARBS,PROTEIN,SATUREATED_FAT,DIETARY_FIBER,CALCIUM,TRANS_FAT,TOTAL_SUGARS,ADDED_SUGARS,IRON,CHOLESTEROL,VITAMIN_D,POTASSIUM,SODIUM"
+    },
+    {
+      "fieldName": "quantityMg",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "percentDailyValues",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "NutritionSummary",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "nutritionSummary",
+      "relationshipName": "product",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

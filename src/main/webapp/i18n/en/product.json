@@ -1,0 +1,37 @@
+{
+  "mcMenuApp": {
+    "product": {
+      "home": {
+        "title": "Products",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Product",
+        "createOrEditLabel": "Create or edit a Product",
+        "search": "Search for Product",
+        "notFound": "No Products found"
+      },
+      "created": "A new Product is created with identifier {{ param }}",
+      "updated": "A Product is updated with identifier {{ param }}",
+      "deleted": "A Product is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Product {{ id }}?"
+      },
+      "detail": {
+        "title": "Product"
+      },
+      "id": "ID",
+      "name": "Name",
+      "imageUrl": "Image Url",
+      "description": "Description",
+      "isLimitedTimeOnly": "Is Limited Time Only",
+      "relatedProductId": "Related Product Id",
+      "displayOrder": "Display Order",
+      "label": "Label",
+      "abbrLabel": "Abbr Label",
+      "isDefault": "Is Default",
+      "nutritionSummary": "Nutrition Summary",
+      "ingredients": "Ingredients",
+      "category": "Category",
+      "meal": "Meal"
+    }
+  }
+}
