@@ -21,7 +21,7 @@ sequenceDiagram
     User ->> User: Enter Login Details
     User ->> Keycloak: Submit Login
     Keycloak ->> Keycloak: Validate
-    Keycoak --> User: Redirect to Application
+    Keycloak --> User: Redirect to Application
 ```
 
 2. Load full menu
