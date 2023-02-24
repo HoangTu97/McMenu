@@ -21,6 +21,9 @@
     "enableTranslation": true,
     "entities": ["Category", "Meal", "Product", "NutritionSummary", "Ingredients"],
     "entitySuffix": "",
+    "herokuAppName": "mc-menu",
+    "herokuDeployType": "jar",
+    "herokuJavaVersion": "11",
     "jhiPrefix": "jhi",
     "jhipsterVersion": "7.9.3",
     "languages": ["en", "vi"],
@@ -29,6 +32,7 @@
     "microfrontend": false,
     "microfrontends": [],
     "nativeLanguage": "en",
+    "oktaAdminLogin": "nxhtu97@gmail.com",
     "otherModules": [],
     "packageName": "com.mcmenu.app",
     "pages": [],
@@ -43,6 +47,7 @@
     "skipFakeData": false,
     "skipUserManagement": true,
     "testFrameworks": [],
+    "useOkta": true,
     "websocket": false,
     "withAdminUi": true
   }

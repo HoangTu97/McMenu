@@ -2,6 +2,10 @@
 
 This application was generated using JHipster 7.9.3
 
+## Link project
+
+[Link](https://mc-menu.herokuapp.com)
+
 ## Database schema
 
 ![Database schema](./docs/database_schema.png)
