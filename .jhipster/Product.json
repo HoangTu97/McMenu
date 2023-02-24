@@ -1,0 +1,88 @@
+{
+  "applications": "*",
+  "changelogDate": "20230223050810",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "product",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "imageUrl",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "5000"
+    },
+    {
+      "fieldName": "isLimitedTimeOnly",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "relatedProductId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "displayOrder",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "label",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "abbrLabel",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "isDefault",
+      "fieldType": "Boolean"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Product",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "nutritionSummary",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "nutritionSummary",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "ingredients",
+      "otherEntityRelationshipName": "product",
+      "ownerSide": true,
+      "relationshipName": "ingredients",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "category",
+      "otherEntityRelationshipName": "product",
+      "ownerSide": false,
+      "relationshipName": "category",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "meal",
+      "otherEntityRelationshipName": "product",
+      "ownerSide": false,
+      "relationshipName": "meal",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

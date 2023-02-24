@@ -1,0 +1,52 @@
+{
+  "applications": "*",
+  "changelogDate": "20230223050812",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "ingredients",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "imageUrl",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "insideIngredients",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "5000"
+    },
+    {
+      "fieldName": "insideContains",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "mayContains",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Ingredients",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "ingredients",
+      "ownerSide": false,
+      "relationshipName": "product",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

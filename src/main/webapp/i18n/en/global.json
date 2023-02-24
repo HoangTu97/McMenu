@@ -7,6 +7,15 @@
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entities",
+        "category": "Category",
+        "meal": "Meal",
+        "product": "Product",
+        "nutritionSummary": "Nutrition Summary",
+        "ingredients": "Ingredients",
+        "order": "Order",
+        "orderProduct": "Order Product",
+        "payment": "Payment",
+        "orders": "Orders",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

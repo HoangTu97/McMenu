@@ -1,0 +1,40 @@
+# ===================================================================
+# Spring Boot configuration for the "heroku" profile.
+#
+# This configuration overrides the application.yml file.
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+eureka:
+  instance:
+    hostname: mc-menu.herokuapp.com
+    non-secure-port: 80
+    prefer-ip-address: false
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+    hikari:
+      maximumPoolSize: 8
+  elasticsearch:
+    uris: ${BONSAI_URL}
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OKTA_OAUTH2_ISSUER}
+        registration:
+          oidc:
+            client-id: ${OKTA_OAUTH2_CLIENT_ID_WEB}
+            client-secret: ${OKTA_OAUTH2_CLIENT_SECRET_WEB}
+server:
+  port: ${PORT:8080}
