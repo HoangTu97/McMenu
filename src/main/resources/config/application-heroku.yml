@@ -24,8 +24,6 @@ spring:
     password: ${JDBC_DATABASE_PASSWORD}
     hikari:
       maximumPoolSize: 8
-  elasticsearch:
-    uris: ${BONSAI_URL}
   security:
     oauth2:
       client:

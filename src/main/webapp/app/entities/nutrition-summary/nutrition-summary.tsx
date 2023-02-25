@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Input, InputGroup, FormGroup, Form, Row, Col, Table } from 'reactstrap';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Table } from 'reactstrap';
+import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { INutritionSummary } from 'app/shared/model/nutrition-summary.model';
-import { searchEntities, getEntities } from './nutrition-summary.reducer';
+import { getEntities } from './nutrition-summary.reducer';
 
 export const NutritionSummary = () => {
   const dispatch = useAppDispatch();
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  const [search, setSearch] = useState('');
 
   const nutritionSummaryList = useAppSelector(state => state.nutritionSummary.entities);
   const loading = useAppSelector(state => state.nutritionSummary.loading);
@@ -25,20 +23,6 @@ export const NutritionSummary = () => {
     dispatch(getEntities({}));
   }, []);
 
-  const startSearching = e => {
-    if (search) {
-      dispatch(searchEntities({ query: search }));
-    }
-    e.preventDefault();
-  };
-
-  const clear = () => {
-    setSearch('');
-    dispatch(getEntities({}));
-  };
-
-  const handleSearch = event => setSearch(event.target.value);
-
   const handleSyncList = () => {
     dispatch(getEntities({}));
   };
@@ -46,62 +30,27 @@ export const NutritionSummary = () => {
   return (
     <div>
       <h2 id="nutrition-summary-heading" data-cy="NutritionSummaryHeading">
-        <Translate contentKey="mcMenuApp.nutritionSummary.home.title">Nutrition Summaries</Translate>
+        Nutrition Summaries
         <div className="d-flex justify-content-end">
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} />{' '}
-            <Translate contentKey="mcMenuApp.nutritionSummary.home.refreshListLabel">Refresh List</Translate>
+            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
           </Button>
           <Link to="/nutrition-summary/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
-            &nbsp;
-            <Translate contentKey="mcMenuApp.nutritionSummary.home.createLabel">Create new Nutrition Summary</Translate>
+            &nbsp; Create a new Nutrition Summary
           </Link>
         </div>
       </h2>
-      <Row>
-        <Col sm="12">
-          <Form onSubmit={startSearching}>
-            <FormGroup>
-              <InputGroup>
-                <Input
-                  type="text"
-                  name="search"
-                  defaultValue={search}
-                  onChange={handleSearch}
-                  placeholder={translate('mcMenuApp.nutritionSummary.home.search')}
-                />
-                <Button className="input-group-addon">
-                  <FontAwesomeIcon icon="search" />
-                </Button>
-                <Button type="reset" className="input-group-addon" onClick={clear}>
-                  <FontAwesomeIcon icon="trash" />
-                </Button>
-              </InputGroup>
-            </FormGroup>
-          </Form>
-        </Col>
-      </Row>
       <div className="table-responsive">
         {nutritionSummaryList && nutritionSummaryList.length > 0 ? (
           <Table responsive>
             <thead>
               <tr>
-                <th>
-                  <Translate contentKey="mcMenuApp.nutritionSummary.id">ID</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="mcMenuApp.nutritionSummary.key">Key</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="mcMenuApp.nutritionSummary.quantityMg">Quantity Mg</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="mcMenuApp.nutritionSummary.percentDailyValues">Percent Daily Values</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="mcMenuApp.nutritionSummary.product">Product</Translate>
-                </th>
+                <th>ID</th>
+                <th>Key</th>
+                <th>Quantity Mg</th>
+                <th>Percent Daily Values</th>
+                <th>Product</th>
                 <th />
               </tr>
             </thead>
@@ -113,9 +62,7 @@ export const NutritionSummary = () => {
                       {nutritionSummary.id}
                     </Button>
                   </td>
-                  <td>
-                    <Translate contentKey={`mcMenuApp.NutritionKey.${nutritionSummary.key}`} />
-                  </td>
+                  <td>{nutritionSummary.key}</td>
                   <td>{nutritionSummary.quantityMg}</td>
                   <td>{nutritionSummary.percentDailyValues}</td>
                   <td>
@@ -134,10 +81,7 @@ export const NutritionSummary = () => {
                         size="sm"
                         data-cy="entityDetailsButton"
                       >
-                        <FontAwesomeIcon icon="eye" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </span>
+                        <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
                       </Button>
                       <Button
                         tag={Link}
@@ -146,10 +90,7 @@ export const NutritionSummary = () => {
                         size="sm"
                         data-cy="entityEditButton"
                       >
-                        <FontAwesomeIcon icon="pencil-alt" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.edit">Edit</Translate>
-                        </span>
+                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
                       </Button>
                       <Button
                         tag={Link}
@@ -158,10 +99,7 @@ export const NutritionSummary = () => {
                         size="sm"
                         data-cy="entityDeleteButton"
                       >
-                        <FontAwesomeIcon icon="trash" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.delete">Delete</Translate>
-                        </span>
+                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
                       </Button>
                     </div>
                   </td>
@@ -170,11 +108,7 @@ export const NutritionSummary = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="mcMenuApp.nutritionSummary.home.notFound">No Nutrition Summaries found</Translate>
-            </div>
-          )
+          !loading && <div className="alert alert-warning">No Nutrition Summaries found</div>
         )}
       </div>
     </div>

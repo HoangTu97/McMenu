@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import {} from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
@@ -22,37 +22,25 @@ export const MealDetail = () => {
   return (
     <Row>
       <Col md="8">
-        <h2 data-cy="mealDetailsHeading">
-          <Translate contentKey="mcMenuApp.meal.detail.title">Meal</Translate>
-        </h2>
+        <h2 data-cy="mealDetailsHeading">Meal</h2>
         <dl className="jh-entity-details">
           <dt>
-            <span id="id">
-              <Translate contentKey="global.field.id">ID</Translate>
-            </span>
+            <span id="id">ID</span>
           </dt>
           <dd>{mealEntity.id}</dd>
           <dt>
-            <span id="name">
-              <Translate contentKey="mcMenuApp.meal.name">Name</Translate>
-            </span>
+            <span id="name">Name</span>
           </dt>
           <dd>{mealEntity.name}</dd>
           <dt>
-            <span id="imageUrl">
-              <Translate contentKey="mcMenuApp.meal.imageUrl">Image Url</Translate>
-            </span>
+            <span id="imageUrl">Image Url</span>
           </dt>
           <dd>{mealEntity.imageUrl}</dd>
           <dt>
-            <span id="description">
-              <Translate contentKey="mcMenuApp.meal.description">Description</Translate>
-            </span>
+            <span id="description">Description</span>
           </dt>
           <dd>{mealEntity.description}</dd>
-          <dt>
-            <Translate contentKey="mcMenuApp.meal.product">Product</Translate>
-          </dt>
+          <dt>Product</dt>
           <dd>
             {mealEntity.products
               ? mealEntity.products.map((val, i) => (
@@ -65,17 +53,11 @@ export const MealDetail = () => {
           </dd>
         </dl>
         <Button tag={Link} to="/meal" replace color="info" data-cy="entityDetailsBackButton">
-          <FontAwesomeIcon icon="arrow-left" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.back">Back</Translate>
-          </span>
+          <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>
         </Button>
         &nbsp;
         <Button tag={Link} to={`/meal/${mealEntity.id}/edit`} replace color="primary">
-          <FontAwesomeIcon icon="pencil-alt" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.edit">Edit</Translate>
-          </span>
+          <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
         </Button>
       </Col>
     </Row>

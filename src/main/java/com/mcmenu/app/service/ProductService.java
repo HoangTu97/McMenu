@@ -1,17 +1,13 @@
 package com.mcmenu.app.service;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.domain.Product;
 import com.mcmenu.app.repository.ProductRepository;
-import com.mcmenu.app.repository.search.ProductSearchRepository;
 import com.mcmenu.app.service.dto.ProductDTO;
 import com.mcmenu.app.service.mapper.ProductMapper;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -32,16 +28,9 @@ public class ProductService {
 
     private final ProductMapper productMapper;
 
-    private final ProductSearchRepository productSearchRepository;
-
-    public ProductService(
-        ProductRepository productRepository,
-        ProductMapper productMapper,
-        ProductSearchRepository productSearchRepository
-    ) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
-        this.productSearchRepository = productSearchRepository;
     }
 
     /**
@@ -55,7 +44,6 @@ public class ProductService {
         Product product = productMapper.toEntity(productDTO);
         product = productRepository.save(product);
         ProductDTO result = productMapper.toDto(product);
-        productSearchRepository.index(product);
         return result;
     }
 
@@ -70,7 +58,6 @@ public class ProductService {
         Product product = productMapper.toEntity(productDTO);
         product = productRepository.save(product);
         ProductDTO result = productMapper.toDto(product);
-        productSearchRepository.index(product);
         return result;
     }
 
@@ -91,11 +78,6 @@ public class ProductService {
                 return existingProduct;
             })
             .map(productRepository::save)
-            .map(savedProduct -> {
-                productSearchRepository.save(savedProduct);
-
-                return savedProduct;
-            })
             .map(productMapper::toDto);
     }
 
@@ -163,21 +145,5 @@ public class ProductService {
     public void delete(Long id) {
         log.debug("Request to delete Product : {}", id);
         productRepository.deleteById(id);
-        productSearchRepository.deleteById(id);
-    }
-
-    /**
-     * Search for the product corresponding to the query.
-     *
-     * @param query the query of the search.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<ProductDTO> search(String query) {
-        log.debug("Request to search Products for query {}", query);
-        return StreamSupport
-            .stream(productSearchRepository.search(query).spliterator(), false)
-            .map(productMapper::toDto)
-            .collect(Collectors.toList());
     }
 }

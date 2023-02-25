@@ -20,11 +20,6 @@ logging:
     org.hibernate.SQL: DEBUG
     com.mcmenu.app: DEBUG
 
-management:
-  health:
-    elasticsearch:
-      enabled: false
-
 spring:
   devtools:
     restart:
@@ -45,8 +40,6 @@ spring:
       auto-commit: false
   jpa:
     database-platform: tech.jhipster.domain.util.FixedPostgreSQL10Dialect
-  elasticsearch:
-    uris: http://localhost:9200
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker

@@ -10,7 +10,6 @@ import com.mcmenu.app.IntegrationTest;
 import com.mcmenu.app.domain.Authority;
 import com.mcmenu.app.domain.User;
 import com.mcmenu.app.repository.UserRepository;
-import com.mcmenu.app.repository.search.UserSearchRepository;
 import com.mcmenu.app.security.AuthoritiesConstants;
 import com.mcmenu.app.service.dto.AdminUserDTO;
 import com.mcmenu.app.service.mapper.UserMapper;
@@ -53,9 +52,6 @@ class UserResourceIT {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserSearchRepository userSearchRepository;
 
     @Autowired
     private UserMapper userMapper;

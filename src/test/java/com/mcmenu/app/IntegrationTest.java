@@ -2,7 +2,6 @@ package com.mcmenu.app;
 
 import com.mcmenu.app.McMenuApp;
 import com.mcmenu.app.config.AsyncSyncConfiguration;
-import com.mcmenu.app.config.EmbeddedElasticsearch;
 import com.mcmenu.app.config.EmbeddedSQL;
 import com.mcmenu.app.config.TestSecurityConfiguration;
 import java.lang.annotation.ElementType;
@@ -18,7 +17,6 @@ import org.springframework.test.annotation.DirtiesContext;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(classes = { McMenuApp.class, AsyncSyncConfiguration.class, TestSecurityConfiguration.class })
-@EmbeddedElasticsearch
 @EmbeddedSQL
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public @interface IntegrationTest {

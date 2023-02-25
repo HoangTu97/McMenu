@@ -1,17 +1,13 @@
 package com.mcmenu.app.service;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.domain.Meal;
 import com.mcmenu.app.repository.MealRepository;
-import com.mcmenu.app.repository.search.MealSearchRepository;
 import com.mcmenu.app.service.dto.MealDTO;
 import com.mcmenu.app.service.mapper.MealMapper;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -32,12 +28,9 @@ public class MealService {
 
     private final MealMapper mealMapper;
 
-    private final MealSearchRepository mealSearchRepository;
-
-    public MealService(MealRepository mealRepository, MealMapper mealMapper, MealSearchRepository mealSearchRepository) {
+    public MealService(MealRepository mealRepository, MealMapper mealMapper) {
         this.mealRepository = mealRepository;
         this.mealMapper = mealMapper;
-        this.mealSearchRepository = mealSearchRepository;
     }
 
     /**
@@ -51,7 +44,6 @@ public class MealService {
         Meal meal = mealMapper.toEntity(mealDTO);
         meal = mealRepository.save(meal);
         MealDTO result = mealMapper.toDto(meal);
-        mealSearchRepository.index(meal);
         return result;
     }
 
@@ -66,7 +58,6 @@ public class MealService {
         Meal meal = mealMapper.toEntity(mealDTO);
         meal = mealRepository.save(meal);
         MealDTO result = mealMapper.toDto(meal);
-        mealSearchRepository.index(meal);
         return result;
     }
 
@@ -87,11 +78,6 @@ public class MealService {
                 return existingMeal;
             })
             .map(mealRepository::save)
-            .map(savedMeal -> {
-                mealSearchRepository.save(savedMeal);
-
-                return savedMeal;
-            })
             .map(mealMapper::toDto);
     }
 
@@ -141,21 +127,5 @@ public class MealService {
     public void delete(Long id) {
         log.debug("Request to delete Meal : {}", id);
         mealRepository.deleteById(id);
-        mealSearchRepository.deleteById(id);
-    }
-
-    /**
-     * Search for the meal corresponding to the query.
-     *
-     * @param query the query of the search.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<MealDTO> search(String query) {
-        log.debug("Request to search Meals for query {}", query);
-        return StreamSupport
-            .stream(mealSearchRepository.search(query).spliterator(), false)
-            .map(mealMapper::toDto)
-            .collect(Collectors.toList());
     }
 }

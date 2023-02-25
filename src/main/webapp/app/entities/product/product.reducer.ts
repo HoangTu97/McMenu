@@ -15,14 +15,8 @@ const initialState: EntityState<IProduct> = {
 };
 
 const apiUrl = 'api/products';
-const apiSearchUrl = 'api/_search/products';
 
 // Actions
-
-export const searchEntities = createAsyncThunk('product/search_entity', async ({ query, page, size, sort }: IQueryParams) => {
-  const requestUrl = `${apiSearchUrl}?query=${query}`;
-  return axios.get<IProduct[]>(requestUrl);
-});
 
 export const getEntities = createAsyncThunk('product/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
   const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
@@ -95,7 +89,7 @@ export const ProductSlice = createEntitySlice({
         state.updateSuccess = true;
         state.entity = {};
       })
-      .addMatcher(isFulfilled(getEntities, searchEntities), (state, action) => {
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
         const { data } = action.payload;
 
         return {
@@ -110,7 +104,7 @@ export const ProductSlice = createEntitySlice({
         state.updateSuccess = true;
         state.entity = action.payload.data;
       })
-      .addMatcher(isPending(getEntities, getEntity, searchEntities), state => {
+      .addMatcher(isPending(getEntities, getEntity), state => {
         state.errorMessage = null;
         state.updateSuccess = false;
         state.loading = true;

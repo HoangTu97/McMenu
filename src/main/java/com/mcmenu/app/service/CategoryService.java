@@ -1,17 +1,13 @@
 package com.mcmenu.app.service;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.domain.Category;
 import com.mcmenu.app.repository.CategoryRepository;
-import com.mcmenu.app.repository.search.CategorySearchRepository;
 import com.mcmenu.app.service.dto.CategoryDTO;
 import com.mcmenu.app.service.mapper.CategoryMapper;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -32,16 +28,9 @@ public class CategoryService {
 
     private final CategoryMapper categoryMapper;
 
-    private final CategorySearchRepository categorySearchRepository;
-
-    public CategoryService(
-        CategoryRepository categoryRepository,
-        CategoryMapper categoryMapper,
-        CategorySearchRepository categorySearchRepository
-    ) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
-        this.categorySearchRepository = categorySearchRepository;
     }
 
     /**
@@ -55,7 +44,6 @@ public class CategoryService {
         Category category = categoryMapper.toEntity(categoryDTO);
         category = categoryRepository.save(category);
         CategoryDTO result = categoryMapper.toDto(category);
-        categorySearchRepository.index(category);
         return result;
     }
 
@@ -70,7 +58,6 @@ public class CategoryService {
         Category category = categoryMapper.toEntity(categoryDTO);
         category = categoryRepository.save(category);
         CategoryDTO result = categoryMapper.toDto(category);
-        categorySearchRepository.index(category);
         return result;
     }
 
@@ -91,11 +78,6 @@ public class CategoryService {
                 return existingCategory;
             })
             .map(categoryRepository::save)
-            .map(savedCategory -> {
-                categorySearchRepository.save(savedCategory);
-
-                return savedCategory;
-            })
             .map(categoryMapper::toDto);
     }
 
@@ -139,21 +121,5 @@ public class CategoryService {
     public void delete(Long id) {
         log.debug("Request to delete Category : {}", id);
         categoryRepository.deleteById(id);
-        categorySearchRepository.deleteById(id);
-    }
-
-    /**
-     * Search for the category corresponding to the query.
-     *
-     * @param query the query of the search.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<CategoryDTO> search(String query) {
-        log.debug("Request to search Categories for query {}", query);
-        return StreamSupport
-            .stream(categorySearchRepository.search(query).spliterator(), false)
-            .map(categoryMapper::toDto)
-            .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { isNumber, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
@@ -81,8 +81,8 @@ export const ProductUpdate = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h2 id="mcMenuApp.product.home.createOrEditLabel" data-cy="ProductCreateUpdateHeading">
-            <Translate contentKey="mcMenuApp.product.home.createOrEditLabel">Create or edit a Product</Translate>
+          <h2 id="testMcMenuApp.product.home.createOrEditLabel" data-cy="ProductCreateUpdateHeading">
+            Create or edit a Product
           </h2>
         </Col>
       </Row>
@@ -92,50 +92,41 @@ export const ProductUpdate = () => {
             <p>Loading...</p>
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
-              {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="product-id"
-                  label={translate('global.field.id')}
-                  validate={{ required: true }}
-                />
-              ) : null}
+              {!isNew ? <ValidatedField name="id" required readOnly id="product-id" label="ID" validate={{ required: true }} /> : null}
               <ValidatedField
-                label={translate('mcMenuApp.product.name')}
+                label="Name"
                 id="product-name"
                 name="name"
                 data-cy="name"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  maxLength: { value: 255, message: translate('entity.validation.maxlength', { max: 255 }) },
+                  required: { value: true, message: 'This field is required.' },
+                  maxLength: { value: 255, message: 'This field cannot be longer than 255 characters.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.product.imageUrl')}
+                label="Image Url"
                 id="product-imageUrl"
                 name="imageUrl"
                 data-cy="imageUrl"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  maxLength: { value: 255, message: translate('entity.validation.maxlength', { max: 255 }) },
+                  required: { value: true, message: 'This field is required.' },
+                  maxLength: { value: 255, message: 'This field cannot be longer than 255 characters.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.product.description')}
+                label="Description"
                 id="product-description"
                 name="description"
                 data-cy="description"
                 type="text"
                 validate={{
-                  maxLength: { value: 5000, message: translate('entity.validation.maxlength', { max: 5000 }) },
+                  maxLength: { value: 5000, message: 'This field cannot be longer than 5000 characters.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.product.isLimitedTimeOnly')}
+                label="Is Limited Time Only"
                 id="product-isLimitedTimeOnly"
                 name="isLimitedTimeOnly"
                 data-cy="isLimitedTimeOnly"
@@ -143,47 +134,27 @@ export const ProductUpdate = () => {
                 type="checkbox"
               />
               <ValidatedField
-                label={translate('mcMenuApp.product.relatedProductId')}
+                label="Related Product Id"
                 id="product-relatedProductId"
                 name="relatedProductId"
                 data-cy="relatedProductId"
                 type="text"
               />
               <ValidatedField
-                label={translate('mcMenuApp.product.displayOrder')}
+                label="Display Order"
                 id="product-displayOrder"
                 name="displayOrder"
                 data-cy="displayOrder"
                 type="text"
                 validate={{
-                  min: { value: 0, message: translate('entity.validation.min', { min: 0 }) },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                  min: { value: 0, message: 'This field should be at least 0.' },
+                  validate: v => isNumber(v) || 'This field should be a number.',
                 }}
               />
-              <ValidatedField label={translate('mcMenuApp.product.label')} id="product-label" name="label" data-cy="label" type="text" />
-              <ValidatedField
-                label={translate('mcMenuApp.product.abbrLabel')}
-                id="product-abbrLabel"
-                name="abbrLabel"
-                data-cy="abbrLabel"
-                type="text"
-              />
-              <ValidatedField
-                label={translate('mcMenuApp.product.isDefault')}
-                id="product-isDefault"
-                name="isDefault"
-                data-cy="isDefault"
-                check
-                type="checkbox"
-              />
-              <ValidatedField
-                label={translate('mcMenuApp.product.ingredients')}
-                id="product-ingredients"
-                data-cy="ingredients"
-                type="select"
-                multiple
-                name="ingredients"
-              >
+              <ValidatedField label="Label" id="product-label" name="label" data-cy="label" type="text" />
+              <ValidatedField label="Abbr Label" id="product-abbrLabel" name="abbrLabel" data-cy="abbrLabel" type="text" />
+              <ValidatedField label="Is Default" id="product-isDefault" name="isDefault" data-cy="isDefault" check type="checkbox" />
+              <ValidatedField label="Ingredients" id="product-ingredients" data-cy="ingredients" type="select" multiple name="ingredients">
                 <option value="" key="0" />
                 {ingredients
                   ? ingredients.map(otherEntity => (
@@ -196,15 +167,12 @@ export const ProductUpdate = () => {
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/product" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
+                <span className="d-none d-md-inline">Back</span>
               </Button>
               &nbsp;
               <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
                 <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
+                &nbsp; Save
               </Button>
             </ValidatedForm>
           )}

@@ -1,10 +1,7 @@
 package com.mcmenu.app.service;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.domain.NutritionSummary;
 import com.mcmenu.app.repository.NutritionSummaryRepository;
-import com.mcmenu.app.repository.search.NutritionSummarySearchRepository;
 import com.mcmenu.app.service.dto.NutritionSummaryDTO;
 import com.mcmenu.app.service.mapper.NutritionSummaryMapper;
 import java.util.HashMap;
@@ -13,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,16 +28,9 @@ public class NutritionSummaryService {
 
     private final NutritionSummaryMapper nutritionSummaryMapper;
 
-    private final NutritionSummarySearchRepository nutritionSummarySearchRepository;
-
-    public NutritionSummaryService(
-        NutritionSummaryRepository nutritionSummaryRepository,
-        NutritionSummaryMapper nutritionSummaryMapper,
-        NutritionSummarySearchRepository nutritionSummarySearchRepository
-    ) {
+    public NutritionSummaryService(NutritionSummaryRepository nutritionSummaryRepository, NutritionSummaryMapper nutritionSummaryMapper) {
         this.nutritionSummaryRepository = nutritionSummaryRepository;
         this.nutritionSummaryMapper = nutritionSummaryMapper;
-        this.nutritionSummarySearchRepository = nutritionSummarySearchRepository;
     }
 
     /**
@@ -55,7 +44,6 @@ public class NutritionSummaryService {
         NutritionSummary nutritionSummary = nutritionSummaryMapper.toEntity(nutritionSummaryDTO);
         nutritionSummary = nutritionSummaryRepository.save(nutritionSummary);
         NutritionSummaryDTO result = nutritionSummaryMapper.toDto(nutritionSummary);
-        nutritionSummarySearchRepository.index(nutritionSummary);
         return result;
     }
 
@@ -70,7 +58,6 @@ public class NutritionSummaryService {
         NutritionSummary nutritionSummary = nutritionSummaryMapper.toEntity(nutritionSummaryDTO);
         nutritionSummary = nutritionSummaryRepository.save(nutritionSummary);
         NutritionSummaryDTO result = nutritionSummaryMapper.toDto(nutritionSummary);
-        nutritionSummarySearchRepository.index(nutritionSummary);
         return result;
     }
 
@@ -91,11 +78,6 @@ public class NutritionSummaryService {
                 return existingNutritionSummary;
             })
             .map(nutritionSummaryRepository::save)
-            .map(savedNutritionSummary -> {
-                nutritionSummarySearchRepository.save(savedNutritionSummary);
-
-                return savedNutritionSummary;
-            })
             .map(nutritionSummaryMapper::toDto);
     }
 
@@ -163,21 +145,5 @@ public class NutritionSummaryService {
     public void delete(Long id) {
         log.debug("Request to delete NutritionSummary : {}", id);
         nutritionSummaryRepository.deleteById(id);
-        nutritionSummarySearchRepository.deleteById(id);
-    }
-
-    /**
-     * Search for the nutritionSummary corresponding to the query.
-     *
-     * @param query the query of the search.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<NutritionSummaryDTO> search(String query) {
-        log.debug("Request to search NutritionSummaries for query {}", query);
-        return StreamSupport
-            .stream(nutritionSummarySearchRepository.search(query).spliterator(), false)
-            .map(nutritionSummaryMapper::toDto)
-            .collect(Collectors.toList());
     }
 }

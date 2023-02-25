@@ -1,7 +1,5 @@
 package com.mcmenu.app.web.rest;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.repository.IngredientsRepository;
 import com.mcmenu.app.service.IngredientsService;
 import com.mcmenu.app.service.dto.IngredientsDTO;
@@ -11,7 +9,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -173,18 +170,5 @@ public class IngredientsResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
-    }
-
-    /**
-     * {@code SEARCH  /_search/ingredients?query=:query} : search for the ingredients corresponding
-     * to the query.
-     *
-     * @param query the query of the ingredients search.
-     * @return the result of the search.
-     */
-    @GetMapping("/_search/ingredients")
-    public List<IngredientsDTO> searchIngredients(@RequestParam String query) {
-        log.debug("REST request to search Ingredients for query {}", query);
-        return ingredientsService.search(query);
     }
 }

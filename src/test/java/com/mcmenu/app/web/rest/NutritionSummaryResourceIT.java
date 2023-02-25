@@ -1,9 +1,7 @@
 package com.mcmenu.app.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -12,19 +10,12 @@ import com.mcmenu.app.IntegrationTest;
 import com.mcmenu.app.domain.NutritionSummary;
 import com.mcmenu.app.domain.enumeration.NutritionKey;
 import com.mcmenu.app.repository.NutritionSummaryRepository;
-import com.mcmenu.app.repository.search.NutritionSummarySearchRepository;
 import com.mcmenu.app.service.dto.NutritionSummaryDTO;
 import com.mcmenu.app.service.mapper.NutritionSummaryMapper;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import javax.persistence.EntityManager;
-import org.apache.commons.collections4.IterableUtils;
-import org.assertj.core.util.IterableUtil;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +44,6 @@ class NutritionSummaryResourceIT {
 
     private static final String ENTITY_API_URL = "/api/nutrition-summaries";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
-    private static final String ENTITY_SEARCH_API_URL = "/api/_search/nutrition-summaries";
 
     private static Random random = new Random();
     private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
@@ -63,9 +53,6 @@ class NutritionSummaryResourceIT {
 
     @Autowired
     private NutritionSummaryMapper nutritionSummaryMapper;
-
-    @Autowired
-    private NutritionSummarySearchRepository nutritionSummarySearchRepository;
 
     @Autowired
     private EntityManager em;
@@ -103,12 +90,6 @@ class NutritionSummaryResourceIT {
         return nutritionSummary;
     }
 
-    @AfterEach
-    public void cleanupElasticSearchRepository() {
-        nutritionSummarySearchRepository.deleteAll();
-        assertThat(nutritionSummarySearchRepository.count()).isEqualTo(0);
-    }
-
     @BeforeEach
     public void initTest() {
         nutritionSummary = createEntity(em);
@@ -118,7 +99,6 @@ class NutritionSummaryResourceIT {
     @Transactional
     void createNutritionSummary() throws Exception {
         int databaseSizeBeforeCreate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         // Create the NutritionSummary
         NutritionSummaryDTO nutritionSummaryDTO = nutritionSummaryMapper.toDto(nutritionSummary);
         restNutritionSummaryMockMvc
@@ -133,12 +113,6 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeCreate + 1);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore + 1);
-            });
         NutritionSummary testNutritionSummary = nutritionSummaryList.get(nutritionSummaryList.size() - 1);
         assertThat(testNutritionSummary.getKey()).isEqualTo(DEFAULT_KEY);
         assertThat(testNutritionSummary.getQuantityMg()).isEqualTo(DEFAULT_QUANTITY_MG);
@@ -153,7 +127,6 @@ class NutritionSummaryResourceIT {
         NutritionSummaryDTO nutritionSummaryDTO = nutritionSummaryMapper.toDto(nutritionSummary);
 
         int databaseSizeBeforeCreate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restNutritionSummaryMockMvc
@@ -168,15 +141,12 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeCreate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void checkKeyIsRequired() throws Exception {
         int databaseSizeBeforeTest = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         // set the field null
         nutritionSummary.setKey(null);
 
@@ -194,8 +164,6 @@ class NutritionSummaryResourceIT {
 
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -246,8 +214,6 @@ class NutritionSummaryResourceIT {
         nutritionSummaryRepository.saveAndFlush(nutritionSummary);
 
         int databaseSizeBeforeUpdate = nutritionSummaryRepository.findAll().size();
-        nutritionSummarySearchRepository.save(nutritionSummary);
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
 
         // Update the nutritionSummary
         NutritionSummary updatedNutritionSummary = nutritionSummaryRepository.findById(nutritionSummary.getId()).get();
@@ -272,24 +238,12 @@ class NutritionSummaryResourceIT {
         assertThat(testNutritionSummary.getKey()).isEqualTo(UPDATED_KEY);
         assertThat(testNutritionSummary.getQuantityMg()).isEqualTo(UPDATED_QUANTITY_MG);
         assertThat(testNutritionSummary.getPercentDailyValues()).isEqualTo(UPDATED_PERCENT_DAILY_VALUES);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-                List<NutritionSummary> nutritionSummarySearchList = IterableUtils.toList(nutritionSummarySearchRepository.findAll());
-                NutritionSummary testNutritionSummarySearch = nutritionSummarySearchList.get(searchDatabaseSizeAfter - 1);
-                assertThat(testNutritionSummarySearch.getKey()).isEqualTo(UPDATED_KEY);
-                assertThat(testNutritionSummarySearch.getQuantityMg()).isEqualTo(UPDATED_QUANTITY_MG);
-                assertThat(testNutritionSummarySearch.getPercentDailyValues()).isEqualTo(UPDATED_PERCENT_DAILY_VALUES);
-            });
     }
 
     @Test
     @Transactional
     void putNonExistingNutritionSummary() throws Exception {
         int databaseSizeBeforeUpdate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         nutritionSummary.setId(count.incrementAndGet());
 
         // Create the NutritionSummary
@@ -308,15 +262,12 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchNutritionSummary() throws Exception {
         int databaseSizeBeforeUpdate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         nutritionSummary.setId(count.incrementAndGet());
 
         // Create the NutritionSummary
@@ -335,15 +286,12 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamNutritionSummary() throws Exception {
         int databaseSizeBeforeUpdate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         nutritionSummary.setId(count.incrementAndGet());
 
         // Create the NutritionSummary
@@ -362,8 +310,6 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -434,7 +380,6 @@ class NutritionSummaryResourceIT {
     @Transactional
     void patchNonExistingNutritionSummary() throws Exception {
         int databaseSizeBeforeUpdate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         nutritionSummary.setId(count.incrementAndGet());
 
         // Create the NutritionSummary
@@ -453,15 +398,12 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchNutritionSummary() throws Exception {
         int databaseSizeBeforeUpdate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         nutritionSummary.setId(count.incrementAndGet());
 
         // Create the NutritionSummary
@@ -480,15 +422,12 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamNutritionSummary() throws Exception {
         int databaseSizeBeforeUpdate = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
         nutritionSummary.setId(count.incrementAndGet());
 
         // Create the NutritionSummary
@@ -507,8 +446,6 @@ class NutritionSummaryResourceIT {
         // Validate the NutritionSummary in the database
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -516,12 +453,8 @@ class NutritionSummaryResourceIT {
     void deleteNutritionSummary() throws Exception {
         // Initialize the database
         nutritionSummaryRepository.saveAndFlush(nutritionSummary);
-        nutritionSummaryRepository.save(nutritionSummary);
-        nutritionSummarySearchRepository.save(nutritionSummary);
 
         int databaseSizeBeforeDelete = nutritionSummaryRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeBefore).isEqualTo(databaseSizeBeforeDelete);
 
         // Delete the nutritionSummary
         restNutritionSummaryMockMvc
@@ -531,25 +464,5 @@ class NutritionSummaryResourceIT {
         // Validate the database contains one less item
         List<NutritionSummary> nutritionSummaryList = nutritionSummaryRepository.findAll();
         assertThat(nutritionSummaryList).hasSize(databaseSizeBeforeDelete - 1);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(nutritionSummarySearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore - 1);
-    }
-
-    @Test
-    @Transactional
-    void searchNutritionSummary() throws Exception {
-        // Initialize the database
-        nutritionSummary = nutritionSummaryRepository.saveAndFlush(nutritionSummary);
-        nutritionSummarySearchRepository.save(nutritionSummary);
-
-        // Search the nutritionSummary
-        restNutritionSummaryMockMvc
-            .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + nutritionSummary.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(nutritionSummary.getId().intValue())))
-            .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY.toString())))
-            .andExpect(jsonPath("$.[*].quantityMg").value(hasItem(DEFAULT_QUANTITY_MG)))
-            .andExpect(jsonPath("$.[*].percentDailyValues").value(hasItem(DEFAULT_PERCENT_DAILY_VALUES)));
     }
 }

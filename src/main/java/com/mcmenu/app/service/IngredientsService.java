@@ -2,7 +2,6 @@ package com.mcmenu.app.service;
 
 import com.mcmenu.app.domain.Ingredients;
 import com.mcmenu.app.repository.IngredientsRepository;
-import com.mcmenu.app.repository.search.IngredientsSearchRepository;
 import com.mcmenu.app.service.dto.IngredientsDTO;
 import com.mcmenu.app.service.mapper.IngredientsMapper;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,16 +28,9 @@ public class IngredientsService {
 
     private final IngredientsMapper ingredientsMapper;
 
-    private final IngredientsSearchRepository ingredientsSearchRepository;
-
-    public IngredientsService(
-        IngredientsRepository ingredientsRepository,
-        IngredientsMapper ingredientsMapper,
-        IngredientsSearchRepository ingredientsSearchRepository
-    ) {
+    public IngredientsService(IngredientsRepository ingredientsRepository, IngredientsMapper ingredientsMapper) {
         this.ingredientsRepository = ingredientsRepository;
         this.ingredientsMapper = ingredientsMapper;
-        this.ingredientsSearchRepository = ingredientsSearchRepository;
     }
 
     /**
@@ -53,7 +44,6 @@ public class IngredientsService {
         Ingredients ingredients = ingredientsMapper.toEntity(ingredientsDTO);
         ingredients = ingredientsRepository.save(ingredients);
         IngredientsDTO result = ingredientsMapper.toDto(ingredients);
-        ingredientsSearchRepository.index(ingredients);
         return result;
     }
 
@@ -68,7 +58,6 @@ public class IngredientsService {
         Ingredients ingredients = ingredientsMapper.toEntity(ingredientsDTO);
         ingredients = ingredientsRepository.save(ingredients);
         IngredientsDTO result = ingredientsMapper.toDto(ingredients);
-        ingredientsSearchRepository.index(ingredients);
         return result;
     }
 
@@ -89,11 +78,6 @@ public class IngredientsService {
                 return existingIngredients;
             })
             .map(ingredientsRepository::save)
-            .map(savedIngredients -> {
-                ingredientsSearchRepository.save(savedIngredients);
-
-                return savedIngredients;
-            })
             .map(ingredientsMapper::toDto);
     }
 
@@ -152,21 +136,5 @@ public class IngredientsService {
     public void delete(Long id) {
         log.debug("Request to delete Ingredients : {}", id);
         ingredientsRepository.deleteById(id);
-        ingredientsSearchRepository.deleteById(id);
-    }
-
-    /**
-     * Search for the ingredients corresponding to the query.
-     *
-     * @param query the query of the search.
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<IngredientsDTO> search(String query) {
-        log.debug("Request to search Ingredients for query {}", query);
-        return StreamSupport
-            .stream(ingredientsSearchRepository.search(query).spliterator(), false)
-            .map(ingredientsMapper::toDto)
-            .collect(Collectors.toList());
     }
 }

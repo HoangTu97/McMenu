@@ -1,7 +1,5 @@
 package com.mcmenu.app.web.rest;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.repository.NutritionSummaryRepository;
 import com.mcmenu.app.service.NutritionSummaryService;
 import com.mcmenu.app.service.dto.NutritionSummaryDTO;
@@ -11,7 +9,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -177,18 +174,5 @@ public class NutritionSummaryResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
-    }
-
-    /**
-     * {@code SEARCH  /_search/nutrition-summaries?query=:query} : search for the nutritionSummary corresponding
-     * to the query.
-     *
-     * @param query the query of the nutritionSummary search.
-     * @return the result of the search.
-     */
-    @GetMapping("/_search/nutrition-summaries")
-    public List<NutritionSummaryDTO> searchNutritionSummaries(@RequestParam String query) {
-        log.debug("REST request to search NutritionSummaries for query {}", query);
-        return nutritionSummaryService.search(query);
     }
 }

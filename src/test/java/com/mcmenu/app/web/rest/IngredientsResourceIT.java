@@ -1,9 +1,7 @@
 package com.mcmenu.app.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -11,19 +9,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.mcmenu.app.IntegrationTest;
 import com.mcmenu.app.domain.Ingredients;
 import com.mcmenu.app.repository.IngredientsRepository;
-import com.mcmenu.app.repository.search.IngredientsSearchRepository;
 import com.mcmenu.app.service.dto.IngredientsDTO;
 import com.mcmenu.app.service.mapper.IngredientsMapper;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import javax.persistence.EntityManager;
-import org.apache.commons.collections4.IterableUtils;
-import org.assertj.core.util.IterableUtil;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +49,6 @@ class IngredientsResourceIT {
 
     private static final String ENTITY_API_URL = "/api/ingredients";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
-    private static final String ENTITY_SEARCH_API_URL = "/api/_search/ingredients";
 
     private static Random random = new Random();
     private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
@@ -68,9 +58,6 @@ class IngredientsResourceIT {
 
     @Autowired
     private IngredientsMapper ingredientsMapper;
-
-    @Autowired
-    private IngredientsSearchRepository ingredientsSearchRepository;
 
     @Autowired
     private EntityManager em;
@@ -112,12 +99,6 @@ class IngredientsResourceIT {
         return ingredients;
     }
 
-    @AfterEach
-    public void cleanupElasticSearchRepository() {
-        ingredientsSearchRepository.deleteAll();
-        assertThat(ingredientsSearchRepository.count()).isEqualTo(0);
-    }
-
     @BeforeEach
     public void initTest() {
         ingredients = createEntity(em);
@@ -127,7 +108,6 @@ class IngredientsResourceIT {
     @Transactional
     void createIngredients() throws Exception {
         int databaseSizeBeforeCreate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         // Create the Ingredients
         IngredientsDTO ingredientsDTO = ingredientsMapper.toDto(ingredients);
         restIngredientsMockMvc
@@ -142,12 +122,6 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeCreate + 1);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore + 1);
-            });
         Ingredients testIngredients = ingredientsList.get(ingredientsList.size() - 1);
         assertThat(testIngredients.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testIngredients.getImageUrl()).isEqualTo(DEFAULT_IMAGE_URL);
@@ -164,7 +138,6 @@ class IngredientsResourceIT {
         IngredientsDTO ingredientsDTO = ingredientsMapper.toDto(ingredients);
 
         int databaseSizeBeforeCreate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restIngredientsMockMvc
@@ -179,15 +152,12 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeCreate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         // set the field null
         ingredients.setName(null);
 
@@ -205,15 +175,12 @@ class IngredientsResourceIT {
 
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void checkImageUrlIsRequired() throws Exception {
         int databaseSizeBeforeTest = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         // set the field null
         ingredients.setImageUrl(null);
 
@@ -231,8 +198,6 @@ class IngredientsResourceIT {
 
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -287,8 +252,6 @@ class IngredientsResourceIT {
         ingredientsRepository.saveAndFlush(ingredients);
 
         int databaseSizeBeforeUpdate = ingredientsRepository.findAll().size();
-        ingredientsSearchRepository.save(ingredients);
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
 
         // Update the ingredients
         Ingredients updatedIngredients = ingredientsRepository.findById(ingredients.getId()).get();
@@ -320,26 +283,12 @@ class IngredientsResourceIT {
         assertThat(testIngredients.getInsideIngredients()).isEqualTo(UPDATED_INSIDE_INGREDIENTS);
         assertThat(testIngredients.getInsideContains()).isEqualTo(UPDATED_INSIDE_CONTAINS);
         assertThat(testIngredients.getMayContains()).isEqualTo(UPDATED_MAY_CONTAINS);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-                List<Ingredients> ingredientsSearchList = IterableUtils.toList(ingredientsSearchRepository.findAll());
-                Ingredients testIngredientsSearch = ingredientsSearchList.get(searchDatabaseSizeAfter - 1);
-                assertThat(testIngredientsSearch.getName()).isEqualTo(UPDATED_NAME);
-                assertThat(testIngredientsSearch.getImageUrl()).isEqualTo(UPDATED_IMAGE_URL);
-                assertThat(testIngredientsSearch.getInsideIngredients()).isEqualTo(UPDATED_INSIDE_INGREDIENTS);
-                assertThat(testIngredientsSearch.getInsideContains()).isEqualTo(UPDATED_INSIDE_CONTAINS);
-                assertThat(testIngredientsSearch.getMayContains()).isEqualTo(UPDATED_MAY_CONTAINS);
-            });
     }
 
     @Test
     @Transactional
     void putNonExistingIngredients() throws Exception {
         int databaseSizeBeforeUpdate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         ingredients.setId(count.incrementAndGet());
 
         // Create the Ingredients
@@ -358,15 +307,12 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchIngredients() throws Exception {
         int databaseSizeBeforeUpdate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         ingredients.setId(count.incrementAndGet());
 
         // Create the Ingredients
@@ -385,15 +331,12 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamIngredients() throws Exception {
         int databaseSizeBeforeUpdate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         ingredients.setId(count.incrementAndGet());
 
         // Create the Ingredients
@@ -412,8 +355,6 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -493,7 +434,6 @@ class IngredientsResourceIT {
     @Transactional
     void patchNonExistingIngredients() throws Exception {
         int databaseSizeBeforeUpdate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         ingredients.setId(count.incrementAndGet());
 
         // Create the Ingredients
@@ -512,15 +452,12 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchIngredients() throws Exception {
         int databaseSizeBeforeUpdate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         ingredients.setId(count.incrementAndGet());
 
         // Create the Ingredients
@@ -539,15 +476,12 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamIngredients() throws Exception {
         int databaseSizeBeforeUpdate = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
         ingredients.setId(count.incrementAndGet());
 
         // Create the Ingredients
@@ -566,8 +500,6 @@ class IngredientsResourceIT {
         // Validate the Ingredients in the database
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -575,12 +507,8 @@ class IngredientsResourceIT {
     void deleteIngredients() throws Exception {
         // Initialize the database
         ingredientsRepository.saveAndFlush(ingredients);
-        ingredientsRepository.save(ingredients);
-        ingredientsSearchRepository.save(ingredients);
 
         int databaseSizeBeforeDelete = ingredientsRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeBefore).isEqualTo(databaseSizeBeforeDelete);
 
         // Delete the ingredients
         restIngredientsMockMvc
@@ -590,27 +518,5 @@ class IngredientsResourceIT {
         // Validate the database contains one less item
         List<Ingredients> ingredientsList = ingredientsRepository.findAll();
         assertThat(ingredientsList).hasSize(databaseSizeBeforeDelete - 1);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ingredientsSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore - 1);
-    }
-
-    @Test
-    @Transactional
-    void searchIngredients() throws Exception {
-        // Initialize the database
-        ingredients = ingredientsRepository.saveAndFlush(ingredients);
-        ingredientsSearchRepository.save(ingredients);
-
-        // Search the ingredients
-        restIngredientsMockMvc
-            .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + ingredients.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(ingredients.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].imageUrl").value(hasItem(DEFAULT_IMAGE_URL)))
-            .andExpect(jsonPath("$.[*].insideIngredients").value(hasItem(DEFAULT_INSIDE_INGREDIENTS)))
-            .andExpect(jsonPath("$.[*].insideContains").value(hasItem(DEFAULT_INSIDE_CONTAINS)))
-            .andExpect(jsonPath("$.[*].mayContains").value(hasItem(DEFAULT_MAY_CONTAINS)));
     }
 }

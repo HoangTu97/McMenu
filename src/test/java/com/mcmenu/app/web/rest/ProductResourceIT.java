@@ -1,7 +1,6 @@
 package com.mcmenu.app.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -11,21 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.mcmenu.app.IntegrationTest;
 import com.mcmenu.app.domain.Product;
 import com.mcmenu.app.repository.ProductRepository;
-import com.mcmenu.app.repository.search.ProductSearchRepository;
 import com.mcmenu.app.service.ProductService;
 import com.mcmenu.app.service.dto.ProductDTO;
 import com.mcmenu.app.service.mapper.ProductMapper;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import javax.persistence.EntityManager;
-import org.apache.commons.collections4.IterableUtils;
-import org.assertj.core.util.IterableUtil;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,7 +71,6 @@ class ProductResourceIT {
 
     private static final String ENTITY_API_URL = "/api/products";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
-    private static final String ENTITY_SEARCH_API_URL = "/api/_search/products";
 
     private static Random random = new Random();
     private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
@@ -95,9 +86,6 @@ class ProductResourceIT {
 
     @Mock
     private ProductService productServiceMock;
-
-    @Autowired
-    private ProductSearchRepository productSearchRepository;
 
     @Autowired
     private EntityManager em;
@@ -147,12 +135,6 @@ class ProductResourceIT {
         return product;
     }
 
-    @AfterEach
-    public void cleanupElasticSearchRepository() {
-        productSearchRepository.deleteAll();
-        assertThat(productSearchRepository.count()).isEqualTo(0);
-    }
-
     @BeforeEach
     public void initTest() {
         product = createEntity(em);
@@ -162,7 +144,6 @@ class ProductResourceIT {
     @Transactional
     void createProduct() throws Exception {
         int databaseSizeBeforeCreate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         // Create the Product
         ProductDTO productDTO = productMapper.toDto(product);
         restProductMockMvc
@@ -177,12 +158,6 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeCreate + 1);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore + 1);
-            });
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testProduct.getImageUrl()).isEqualTo(DEFAULT_IMAGE_URL);
@@ -203,7 +178,6 @@ class ProductResourceIT {
         ProductDTO productDTO = productMapper.toDto(product);
 
         int databaseSizeBeforeCreate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restProductMockMvc
@@ -218,15 +192,12 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeCreate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         // set the field null
         product.setName(null);
 
@@ -244,15 +215,12 @@ class ProductResourceIT {
 
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void checkImageUrlIsRequired() throws Exception {
         int databaseSizeBeforeTest = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         // set the field null
         product.setImageUrl(null);
 
@@ -270,8 +238,6 @@ class ProductResourceIT {
 
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -351,8 +317,6 @@ class ProductResourceIT {
         productRepository.saveAndFlush(product);
 
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
-        productSearchRepository.save(product);
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
 
         // Update the product
         Product updatedProduct = productRepository.findById(product.getId()).get();
@@ -392,30 +356,12 @@ class ProductResourceIT {
         assertThat(testProduct.getLabel()).isEqualTo(UPDATED_LABEL);
         assertThat(testProduct.getAbbrLabel()).isEqualTo(UPDATED_ABBR_LABEL);
         assertThat(testProduct.getIsDefault()).isEqualTo(UPDATED_IS_DEFAULT);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-                List<Product> productSearchList = IterableUtils.toList(productSearchRepository.findAll());
-                Product testProductSearch = productSearchList.get(searchDatabaseSizeAfter - 1);
-                assertThat(testProductSearch.getName()).isEqualTo(UPDATED_NAME);
-                assertThat(testProductSearch.getImageUrl()).isEqualTo(UPDATED_IMAGE_URL);
-                assertThat(testProductSearch.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-                assertThat(testProductSearch.getIsLimitedTimeOnly()).isEqualTo(UPDATED_IS_LIMITED_TIME_ONLY);
-                assertThat(testProductSearch.getRelatedProductId()).isEqualTo(UPDATED_RELATED_PRODUCT_ID);
-                assertThat(testProductSearch.getDisplayOrder()).isEqualTo(UPDATED_DISPLAY_ORDER);
-                assertThat(testProductSearch.getLabel()).isEqualTo(UPDATED_LABEL);
-                assertThat(testProductSearch.getAbbrLabel()).isEqualTo(UPDATED_ABBR_LABEL);
-                assertThat(testProductSearch.getIsDefault()).isEqualTo(UPDATED_IS_DEFAULT);
-            });
     }
 
     @Test
     @Transactional
     void putNonExistingProduct() throws Exception {
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         product.setId(count.incrementAndGet());
 
         // Create the Product
@@ -434,15 +380,12 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchProduct() throws Exception {
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         product.setId(count.incrementAndGet());
 
         // Create the Product
@@ -461,15 +404,12 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamProduct() throws Exception {
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         product.setId(count.incrementAndGet());
 
         // Create the Product
@@ -488,8 +428,6 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -581,7 +519,6 @@ class ProductResourceIT {
     @Transactional
     void patchNonExistingProduct() throws Exception {
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         product.setId(count.incrementAndGet());
 
         // Create the Product
@@ -600,15 +537,12 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchProduct() throws Exception {
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         product.setId(count.incrementAndGet());
 
         // Create the Product
@@ -627,15 +561,12 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamProduct() throws Exception {
         int databaseSizeBeforeUpdate = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
         product.setId(count.incrementAndGet());
 
         // Create the Product
@@ -654,8 +585,6 @@ class ProductResourceIT {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -663,12 +592,8 @@ class ProductResourceIT {
     void deleteProduct() throws Exception {
         // Initialize the database
         productRepository.saveAndFlush(product);
-        productRepository.save(product);
-        productSearchRepository.save(product);
 
         int databaseSizeBeforeDelete = productRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeBefore).isEqualTo(databaseSizeBeforeDelete);
 
         // Delete the product
         restProductMockMvc
@@ -678,31 +603,5 @@ class ProductResourceIT {
         // Validate the database contains one less item
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeDelete - 1);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(productSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore - 1);
-    }
-
-    @Test
-    @Transactional
-    void searchProduct() throws Exception {
-        // Initialize the database
-        product = productRepository.saveAndFlush(product);
-        productSearchRepository.save(product);
-
-        // Search the product
-        restProductMockMvc
-            .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + product.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(product.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].imageUrl").value(hasItem(DEFAULT_IMAGE_URL)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-            .andExpect(jsonPath("$.[*].isLimitedTimeOnly").value(hasItem(DEFAULT_IS_LIMITED_TIME_ONLY.booleanValue())))
-            .andExpect(jsonPath("$.[*].relatedProductId").value(hasItem(DEFAULT_RELATED_PRODUCT_ID.intValue())))
-            .andExpect(jsonPath("$.[*].displayOrder").value(hasItem(DEFAULT_DISPLAY_ORDER)))
-            .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
-            .andExpect(jsonPath("$.[*].abbrLabel").value(hasItem(DEFAULT_ABBR_LABEL)))
-            .andExpect(jsonPath("$.[*].isDefault").value(hasItem(DEFAULT_IS_DEFAULT.booleanValue())));
     }
 }

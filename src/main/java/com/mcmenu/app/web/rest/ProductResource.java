@@ -172,17 +172,4 @@ public class ProductResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
-
-    /**
-     * {@code SEARCH  /_search/products?query=:query} : search for the product corresponding
-     * to the query.
-     *
-     * @param query the query of the product search.
-     * @return the result of the search.
-     */
-    @GetMapping("/_search/products")
-    public List<ProductDTO> searchProducts(@RequestParam String query) {
-        log.debug("REST request to search Products for query {}", query);
-        return productService.search(query);
-    }
 }

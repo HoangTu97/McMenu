@@ -1,7 +1,5 @@
 package com.mcmenu.app.web.rest;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 import com.mcmenu.app.repository.MealRepository;
 import com.mcmenu.app.service.MealService;
 import com.mcmenu.app.service.dto.MealDTO;
@@ -11,7 +9,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -174,18 +171,5 @@ public class MealResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
-    }
-
-    /**
-     * {@code SEARCH  /_search/meals?query=:query} : search for the meal corresponding
-     * to the query.
-     *
-     * @param query the query of the meal search.
-     * @return the result of the search.
-     */
-    @GetMapping("/_search/meals")
-    public List<MealDTO> searchMeals(@RequestParam String query) {
-        log.debug("REST request to search Meals for query {}", query);
-        return mealService.search(query);
     }
 }

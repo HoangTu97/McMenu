@@ -1,7 +1,6 @@
 package com.mcmenu.app.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -11,21 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.mcmenu.app.IntegrationTest;
 import com.mcmenu.app.domain.Meal;
 import com.mcmenu.app.repository.MealRepository;
-import com.mcmenu.app.repository.search.MealSearchRepository;
 import com.mcmenu.app.service.MealService;
 import com.mcmenu.app.service.dto.MealDTO;
 import com.mcmenu.app.service.mapper.MealMapper;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import javax.persistence.EntityManager;
-import org.apache.commons.collections4.IterableUtils;
-import org.assertj.core.util.IterableUtil;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +53,6 @@ class MealResourceIT {
 
     private static final String ENTITY_API_URL = "/api/meals";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
-    private static final String ENTITY_SEARCH_API_URL = "/api/_search/meals";
 
     private static Random random = new Random();
     private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
@@ -77,9 +68,6 @@ class MealResourceIT {
 
     @Mock
     private MealService mealServiceMock;
-
-    @Autowired
-    private MealSearchRepository mealSearchRepository;
 
     @Autowired
     private EntityManager em;
@@ -111,12 +99,6 @@ class MealResourceIT {
         return meal;
     }
 
-    @AfterEach
-    public void cleanupElasticSearchRepository() {
-        mealSearchRepository.deleteAll();
-        assertThat(mealSearchRepository.count()).isEqualTo(0);
-    }
-
     @BeforeEach
     public void initTest() {
         meal = createEntity(em);
@@ -126,7 +108,6 @@ class MealResourceIT {
     @Transactional
     void createMeal() throws Exception {
         int databaseSizeBeforeCreate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         // Create the Meal
         MealDTO mealDTO = mealMapper.toDto(meal);
         restMealMockMvc
@@ -141,12 +122,6 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeCreate + 1);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore + 1);
-            });
         Meal testMeal = mealList.get(mealList.size() - 1);
         assertThat(testMeal.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testMeal.getImageUrl()).isEqualTo(DEFAULT_IMAGE_URL);
@@ -161,7 +136,6 @@ class MealResourceIT {
         MealDTO mealDTO = mealMapper.toDto(meal);
 
         int databaseSizeBeforeCreate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restMealMockMvc
@@ -176,15 +150,12 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeCreate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         // set the field null
         meal.setName(null);
 
@@ -202,15 +173,12 @@ class MealResourceIT {
 
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void checkImageUrlIsRequired() throws Exception {
         int databaseSizeBeforeTest = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         // set the field null
         meal.setImageUrl(null);
 
@@ -228,8 +196,6 @@ class MealResourceIT {
 
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -297,8 +263,6 @@ class MealResourceIT {
         mealRepository.saveAndFlush(meal);
 
         int databaseSizeBeforeUpdate = mealRepository.findAll().size();
-        mealSearchRepository.save(meal);
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
 
         // Update the meal
         Meal updatedMeal = mealRepository.findById(meal.getId()).get();
@@ -323,24 +287,12 @@ class MealResourceIT {
         assertThat(testMeal.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testMeal.getImageUrl()).isEqualTo(UPDATED_IMAGE_URL);
         assertThat(testMeal.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        await()
-            .atMost(5, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-                List<Meal> mealSearchList = IterableUtils.toList(mealSearchRepository.findAll());
-                Meal testMealSearch = mealSearchList.get(searchDatabaseSizeAfter - 1);
-                assertThat(testMealSearch.getName()).isEqualTo(UPDATED_NAME);
-                assertThat(testMealSearch.getImageUrl()).isEqualTo(UPDATED_IMAGE_URL);
-                assertThat(testMealSearch.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-            });
     }
 
     @Test
     @Transactional
     void putNonExistingMeal() throws Exception {
         int databaseSizeBeforeUpdate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         meal.setId(count.incrementAndGet());
 
         // Create the Meal
@@ -359,15 +311,12 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchMeal() throws Exception {
         int databaseSizeBeforeUpdate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         meal.setId(count.incrementAndGet());
 
         // Create the Meal
@@ -386,15 +335,12 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamMeal() throws Exception {
         int databaseSizeBeforeUpdate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         meal.setId(count.incrementAndGet());
 
         // Create the Meal
@@ -410,8 +356,6 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -482,7 +426,6 @@ class MealResourceIT {
     @Transactional
     void patchNonExistingMeal() throws Exception {
         int databaseSizeBeforeUpdate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         meal.setId(count.incrementAndGet());
 
         // Create the Meal
@@ -501,15 +444,12 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchMeal() throws Exception {
         int databaseSizeBeforeUpdate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         meal.setId(count.incrementAndGet());
 
         // Create the Meal
@@ -528,15 +468,12 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamMeal() throws Exception {
         int databaseSizeBeforeUpdate = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
         meal.setId(count.incrementAndGet());
 
         // Create the Meal
@@ -555,8 +492,6 @@ class MealResourceIT {
         // Validate the Meal in the database
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeUpdate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -564,12 +499,8 @@ class MealResourceIT {
     void deleteMeal() throws Exception {
         // Initialize the database
         mealRepository.saveAndFlush(meal);
-        mealRepository.save(meal);
-        mealSearchRepository.save(meal);
 
         int databaseSizeBeforeDelete = mealRepository.findAll().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeBefore).isEqualTo(databaseSizeBeforeDelete);
 
         // Delete the meal
         restMealMockMvc
@@ -579,25 +510,5 @@ class MealResourceIT {
         // Validate the database contains one less item
         List<Meal> mealList = mealRepository.findAll();
         assertThat(mealList).hasSize(databaseSizeBeforeDelete - 1);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(mealSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore - 1);
-    }
-
-    @Test
-    @Transactional
-    void searchMeal() throws Exception {
-        // Initialize the database
-        meal = mealRepository.saveAndFlush(meal);
-        mealSearchRepository.save(meal);
-
-        // Search the meal
-        restMealMockMvc
-            .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + meal.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(meal.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].imageUrl").value(hasItem(DEFAULT_IMAGE_URL)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
     }
 }

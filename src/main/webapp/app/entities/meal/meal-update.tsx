@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { isNumber, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
@@ -77,8 +77,8 @@ export const MealUpdate = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h2 id="mcMenuApp.meal.home.createOrEditLabel" data-cy="MealCreateUpdateHeading">
-            <Translate contentKey="mcMenuApp.meal.home.createOrEditLabel">Create or edit a Meal</Translate>
+          <h2 id="testMcMenuApp.meal.home.createOrEditLabel" data-cy="MealCreateUpdateHeading">
+            Create or edit a Meal
           </h2>
         </Col>
       </Row>
@@ -88,56 +88,40 @@ export const MealUpdate = () => {
             <p>Loading...</p>
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
-              {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="meal-id"
-                  label={translate('global.field.id')}
-                  validate={{ required: true }}
-                />
-              ) : null}
+              {!isNew ? <ValidatedField name="id" required readOnly id="meal-id" label="ID" validate={{ required: true }} /> : null}
               <ValidatedField
-                label={translate('mcMenuApp.meal.name')}
+                label="Name"
                 id="meal-name"
                 name="name"
                 data-cy="name"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  maxLength: { value: 255, message: translate('entity.validation.maxlength', { max: 255 }) },
+                  required: { value: true, message: 'This field is required.' },
+                  maxLength: { value: 255, message: 'This field cannot be longer than 255 characters.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.meal.imageUrl')}
+                label="Image Url"
                 id="meal-imageUrl"
                 name="imageUrl"
                 data-cy="imageUrl"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  maxLength: { value: 255, message: translate('entity.validation.maxlength', { max: 255 }) },
+                  required: { value: true, message: 'This field is required.' },
+                  maxLength: { value: 255, message: 'This field cannot be longer than 255 characters.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.meal.description')}
+                label="Description"
                 id="meal-description"
                 name="description"
                 data-cy="description"
                 type="text"
                 validate={{
-                  maxLength: { value: 5000, message: translate('entity.validation.maxlength', { max: 5000 }) },
+                  maxLength: { value: 5000, message: 'This field cannot be longer than 5000 characters.' },
                 }}
               />
-              <ValidatedField
-                label={translate('mcMenuApp.meal.product')}
-                id="meal-product"
-                data-cy="product"
-                type="select"
-                multiple
-                name="products"
-              >
+              <ValidatedField label="Product" id="meal-product" data-cy="product" type="select" multiple name="products">
                 <option value="" key="0" />
                 {products
                   ? products.map(otherEntity => (
@@ -150,15 +134,12 @@ export const MealUpdate = () => {
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/meal" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
+                <span className="d-none d-md-inline">Back</span>
               </Button>
               &nbsp;
               <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
                 <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
+                &nbsp; Save
               </Button>
             </ValidatedForm>
           )}

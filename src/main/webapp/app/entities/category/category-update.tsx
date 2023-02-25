@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { isNumber, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
@@ -79,8 +79,8 @@ export const CategoryUpdate = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h2 id="mcMenuApp.category.home.createOrEditLabel" data-cy="CategoryCreateUpdateHeading">
-            <Translate contentKey="mcMenuApp.category.home.createOrEditLabel">Create or edit a Category</Translate>
+          <h2 id="testMcMenuApp.category.home.createOrEditLabel" data-cy="CategoryCreateUpdateHeading">
+            Create or edit a Category
           </h2>
         </Col>
       </Row>
@@ -90,44 +90,28 @@ export const CategoryUpdate = () => {
             <p>Loading...</p>
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
-              {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="category-id"
-                  label={translate('global.field.id')}
-                  validate={{ required: true }}
-                />
-              ) : null}
+              {!isNew ? <ValidatedField name="id" required readOnly id="category-id" label="ID" validate={{ required: true }} /> : null}
               <ValidatedField
-                label={translate('mcMenuApp.category.name')}
+                label="Name"
                 id="category-name"
                 name="name"
                 data-cy="name"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
+                  required: { value: true, message: 'This field is required.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.category.imageUrl')}
+                label="Image Url"
                 id="category-imageUrl"
                 name="imageUrl"
                 data-cy="imageUrl"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
+                  required: { value: true, message: 'This field is required.' },
                 }}
               />
-              <ValidatedField
-                label={translate('mcMenuApp.category.product')}
-                id="category-product"
-                data-cy="product"
-                type="select"
-                multiple
-                name="products"
-              >
+              <ValidatedField label="Product" id="category-product" data-cy="product" type="select" multiple name="products">
                 <option value="" key="0" />
                 {products
                   ? products.map(otherEntity => (
@@ -137,14 +121,7 @@ export const CategoryUpdate = () => {
                     ))
                   : null}
               </ValidatedField>
-              <ValidatedField
-                label={translate('mcMenuApp.category.meal')}
-                id="category-meal"
-                data-cy="meal"
-                type="select"
-                multiple
-                name="meals"
-              >
+              <ValidatedField label="Meal" id="category-meal" data-cy="meal" type="select" multiple name="meals">
                 <option value="" key="0" />
                 {meals
                   ? meals.map(otherEntity => (
@@ -157,15 +134,12 @@ export const CategoryUpdate = () => {
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/category" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
+                <span className="d-none d-md-inline">Back</span>
               </Button>
               &nbsp;
               <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
                 <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
+                &nbsp; Save
               </Button>
             </ValidatedForm>
           )}

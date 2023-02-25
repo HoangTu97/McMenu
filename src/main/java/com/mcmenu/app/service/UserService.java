@@ -5,7 +5,6 @@ import com.mcmenu.app.domain.Authority;
 import com.mcmenu.app.domain.User;
 import com.mcmenu.app.repository.AuthorityRepository;
 import com.mcmenu.app.repository.UserRepository;
-import com.mcmenu.app.repository.search.UserSearchRepository;
 import com.mcmenu.app.security.SecurityUtils;
 import com.mcmenu.app.service.dto.AdminUserDTO;
 import com.mcmenu.app.service.dto.UserDTO;
@@ -35,20 +34,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final UserSearchRepository userSearchRepository;
-
     private final AuthorityRepository authorityRepository;
 
     private final CacheManager cacheManager;
 
-    public UserService(
-        UserRepository userRepository,
-        UserSearchRepository userSearchRepository,
-        AuthorityRepository authorityRepository,
-        CacheManager cacheManager
-    ) {
+    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository, CacheManager cacheManager) {
         this.userRepository = userRepository;
-        this.userSearchRepository = userSearchRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
     }
@@ -74,7 +65,6 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
-                userSearchRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
             });

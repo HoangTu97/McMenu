@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { isNumber, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
@@ -76,8 +76,8 @@ export const NutritionSummaryUpdate = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h2 id="mcMenuApp.nutritionSummary.home.createOrEditLabel" data-cy="NutritionSummaryCreateUpdateHeading">
-            <Translate contentKey="mcMenuApp.nutritionSummary.home.createOrEditLabel">Create or edit a NutritionSummary</Translate>
+          <h2 id="testMcMenuApp.nutritionSummary.home.createOrEditLabel" data-cy="NutritionSummaryCreateUpdateHeading">
+            Create or edit a Nutrition Summary
           </h2>
         </Col>
       </Row>
@@ -88,57 +88,38 @@ export const NutritionSummaryUpdate = () => {
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="nutrition-summary-id"
-                  label={translate('global.field.id')}
-                  validate={{ required: true }}
-                />
+                <ValidatedField name="id" required readOnly id="nutrition-summary-id" label="ID" validate={{ required: true }} />
               ) : null}
-              <ValidatedField
-                label={translate('mcMenuApp.nutritionSummary.key')}
-                id="nutrition-summary-key"
-                name="key"
-                data-cy="key"
-                type="select"
-              >
+              <ValidatedField label="Key" id="nutrition-summary-key" name="key" data-cy="key" type="select">
                 {nutritionKeyValues.map(nutritionKey => (
                   <option value={nutritionKey} key={nutritionKey}>
-                    {translate('mcMenuApp.NutritionKey.' + nutritionKey)}
+                    {nutritionKey}
                   </option>
                 ))}
               </ValidatedField>
               <ValidatedField
-                label={translate('mcMenuApp.nutritionSummary.quantityMg')}
+                label="Quantity Mg"
                 id="nutrition-summary-quantityMg"
                 name="quantityMg"
                 data-cy="quantityMg"
                 type="text"
                 validate={{
-                  min: { value: 0, message: translate('entity.validation.min', { min: 0 }) },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                  min: { value: 0, message: 'This field should be at least 0.' },
+                  validate: v => isNumber(v) || 'This field should be a number.',
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.nutritionSummary.percentDailyValues')}
+                label="Percent Daily Values"
                 id="nutrition-summary-percentDailyValues"
                 name="percentDailyValues"
                 data-cy="percentDailyValues"
                 type="text"
                 validate={{
-                  min: { value: 0, message: translate('entity.validation.min', { min: 0 }) },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                  min: { value: 0, message: 'This field should be at least 0.' },
+                  validate: v => isNumber(v) || 'This field should be a number.',
                 }}
               />
-              <ValidatedField
-                id="nutrition-summary-product"
-                name="product"
-                data-cy="product"
-                label={translate('mcMenuApp.nutritionSummary.product')}
-                type="select"
-              >
+              <ValidatedField id="nutrition-summary-product" name="product" data-cy="product" label="Product" type="select">
                 <option value="" key="0" />
                 {products
                   ? products.map(otherEntity => (
@@ -151,15 +132,12 @@ export const NutritionSummaryUpdate = () => {
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/nutrition-summary" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
+                <span className="d-none d-md-inline">Back</span>
               </Button>
               &nbsp;
               <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
                 <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
+                &nbsp; Save
               </Button>
             </ValidatedForm>
           )}

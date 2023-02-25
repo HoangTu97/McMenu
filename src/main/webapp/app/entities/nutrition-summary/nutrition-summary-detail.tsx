@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import {} from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
@@ -22,51 +22,33 @@ export const NutritionSummaryDetail = () => {
   return (
     <Row>
       <Col md="8">
-        <h2 data-cy="nutritionSummaryDetailsHeading">
-          <Translate contentKey="mcMenuApp.nutritionSummary.detail.title">NutritionSummary</Translate>
-        </h2>
+        <h2 data-cy="nutritionSummaryDetailsHeading">Nutrition Summary</h2>
         <dl className="jh-entity-details">
           <dt>
-            <span id="id">
-              <Translate contentKey="global.field.id">ID</Translate>
-            </span>
+            <span id="id">ID</span>
           </dt>
           <dd>{nutritionSummaryEntity.id}</dd>
           <dt>
-            <span id="key">
-              <Translate contentKey="mcMenuApp.nutritionSummary.key">Key</Translate>
-            </span>
+            <span id="key">Key</span>
           </dt>
           <dd>{nutritionSummaryEntity.key}</dd>
           <dt>
-            <span id="quantityMg">
-              <Translate contentKey="mcMenuApp.nutritionSummary.quantityMg">Quantity Mg</Translate>
-            </span>
+            <span id="quantityMg">Quantity Mg</span>
           </dt>
           <dd>{nutritionSummaryEntity.quantityMg}</dd>
           <dt>
-            <span id="percentDailyValues">
-              <Translate contentKey="mcMenuApp.nutritionSummary.percentDailyValues">Percent Daily Values</Translate>
-            </span>
+            <span id="percentDailyValues">Percent Daily Values</span>
           </dt>
           <dd>{nutritionSummaryEntity.percentDailyValues}</dd>
-          <dt>
-            <Translate contentKey="mcMenuApp.nutritionSummary.product">Product</Translate>
-          </dt>
+          <dt>Product</dt>
           <dd>{nutritionSummaryEntity.product ? nutritionSummaryEntity.product.id : ''}</dd>
         </dl>
         <Button tag={Link} to="/nutrition-summary" replace color="info" data-cy="entityDetailsBackButton">
-          <FontAwesomeIcon icon="arrow-left" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.back">Back</Translate>
-          </span>
+          <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>
         </Button>
         &nbsp;
         <Button tag={Link} to={`/nutrition-summary/${nutritionSummaryEntity.id}/edit`} replace color="primary">
-          <FontAwesomeIcon icon="pencil-alt" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.edit">Edit</Translate>
-          </span>
+          <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
         </Button>
       </Col>
     </Row>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { isNumber, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
@@ -71,8 +71,8 @@ export const IngredientsUpdate = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h2 id="mcMenuApp.ingredients.home.createOrEditLabel" data-cy="IngredientsCreateUpdateHeading">
-            <Translate contentKey="mcMenuApp.ingredients.home.createOrEditLabel">Create or edit a Ingredients</Translate>
+          <h2 id="testMcMenuApp.ingredients.home.createOrEditLabel" data-cy="IngredientsCreateUpdateHeading">
+            Create or edit a Ingredients
           </h2>
         </Col>
       </Row>
@@ -82,78 +82,66 @@ export const IngredientsUpdate = () => {
             <p>Loading...</p>
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
-              {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="ingredients-id"
-                  label={translate('global.field.id')}
-                  validate={{ required: true }}
-                />
-              ) : null}
+              {!isNew ? <ValidatedField name="id" required readOnly id="ingredients-id" label="ID" validate={{ required: true }} /> : null}
               <ValidatedField
-                label={translate('mcMenuApp.ingredients.name')}
+                label="Name"
                 id="ingredients-name"
                 name="name"
                 data-cy="name"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
+                  required: { value: true, message: 'This field is required.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.ingredients.imageUrl')}
+                label="Image Url"
                 id="ingredients-imageUrl"
                 name="imageUrl"
                 data-cy="imageUrl"
                 type="text"
                 validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
+                  required: { value: true, message: 'This field is required.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.ingredients.insideIngredients')}
+                label="Inside Ingredients"
                 id="ingredients-insideIngredients"
                 name="insideIngredients"
                 data-cy="insideIngredients"
                 type="text"
                 validate={{
-                  maxLength: { value: 5000, message: translate('entity.validation.maxlength', { max: 5000 }) },
+                  maxLength: { value: 5000, message: 'This field cannot be longer than 5000 characters.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.ingredients.insideContains')}
+                label="Inside Contains"
                 id="ingredients-insideContains"
                 name="insideContains"
                 data-cy="insideContains"
                 type="text"
                 validate={{
-                  maxLength: { value: 255, message: translate('entity.validation.maxlength', { max: 255 }) },
+                  maxLength: { value: 255, message: 'This field cannot be longer than 255 characters.' },
                 }}
               />
               <ValidatedField
-                label={translate('mcMenuApp.ingredients.mayContains')}
+                label="May Contains"
                 id="ingredients-mayContains"
                 name="mayContains"
                 data-cy="mayContains"
                 type="text"
                 validate={{
-                  maxLength: { value: 255, message: translate('entity.validation.maxlength', { max: 255 }) },
+                  maxLength: { value: 255, message: 'This field cannot be longer than 255 characters.' },
                 }}
               />
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/ingredients" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
+                <span className="d-none d-md-inline">Back</span>
               </Button>
               &nbsp;
               <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
                 <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
+                &nbsp; Save
               </Button>
             </ValidatedForm>
           )}

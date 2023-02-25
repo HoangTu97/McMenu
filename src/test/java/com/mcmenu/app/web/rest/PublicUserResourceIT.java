@@ -9,7 +9,6 @@ import com.mcmenu.app.IntegrationTest;
 import com.mcmenu.app.config.TestSecurityConfiguration;
 import com.mcmenu.app.domain.User;
 import com.mcmenu.app.repository.UserRepository;
-import com.mcmenu.app.repository.search.UserSearchRepository;
 import com.mcmenu.app.security.AuthoritiesConstants;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,14 +33,6 @@ class PublicUserResourceIT {
 
     @Autowired
     private UserRepository userRepository;
-
-    /**
-     * This repository is mocked in the com.mcmenu.app.repository.search test package.
-     *
-     * @see com.mcmenu.app.repository.search.UserSearchRepositoryMockConfiguration
-     */
-    @Autowired
-    private UserSearchRepository mockUserSearchRepository;
 
     @Autowired
     private EntityManager em;

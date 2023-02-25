@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -42,23 +42,17 @@ export const CategoryDeleteDialog = () => {
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="categoryDeleteDialogHeading">
-        <Translate contentKey="entity.delete.title">Confirm delete operation</Translate>
+        Confirm delete operation
       </ModalHeader>
-      <ModalBody id="mcMenuApp.category.delete.question">
-        <Translate contentKey="mcMenuApp.category.delete.question" interpolate={{ id: categoryEntity.id }}>
-          Are you sure you want to delete this Category?
-        </Translate>
-      </ModalBody>
+      <ModalBody id="testMcMenuApp.category.delete.question">Are you sure you want to delete Category {categoryEntity.id}?</ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={handleClose}>
           <FontAwesomeIcon icon="ban" />
-          &nbsp;
-          <Translate contentKey="entity.action.cancel">Cancel</Translate>
+          &nbsp; Cancel
         </Button>
         <Button id="jhi-confirm-delete-category" data-cy="entityConfirmDeleteButton" color="danger" onClick={confirmDelete}>
           <FontAwesomeIcon icon="trash" />
-          &nbsp;
-          <Translate contentKey="entity.action.delete">Delete</Translate>
+          &nbsp; Delete
         </Button>
       </ModalFooter>
     </Modal>
