@@ -84,7 +84,9 @@ public class SecurityConfiguration {
             .antMatchers("/api/auth-info").permitAll()
             .antMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/public/**").permitAll()
-            .antMatchers("/api/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/api/account/**").permitAll()
+            // .antMatchers("/api/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/api/**").permitAll()
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/health/**").permitAll()
             .antMatchers("/management/info").permitAll()
@@ -112,8 +114,8 @@ public class SecurityConfiguration {
     /**
      * Map authorities from "groups" or "roles" claim in ID Token.
      *
-     * @return a {@link GrantedAuthoritiesMapper} that maps groups from
-     * the IdP to Spring Security Authorities.
+     * @return a {@link GrantedAuthoritiesMapper} that maps groups from the IdP to Spring Security
+     *         Authorities.
      */
     @Bean
     public GrantedAuthoritiesMapper userAuthoritiesMapper() {
